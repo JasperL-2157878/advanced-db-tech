@@ -1,0 +1,7 @@
+# Environment settings
+.vscode/
+.idea/
+
+# Folders and files
+.env
+build/
