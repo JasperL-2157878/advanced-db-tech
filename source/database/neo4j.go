@@ -2,6 +2,8 @@ package database
 
 import (
 	"context"
+	"log"
+	"os"
 
 	"github.com/neo4j/neo4j-go-driver/v5/neo4j"
 )
@@ -12,10 +14,11 @@ type Neo4jWrapper struct {
 }
 
 func newNeo4j() *Neo4jWrapper {
-	host := "host"
-	user := "user"
-	pass := "pass"
+	host := os.Getenv("NEO4J_HOST")
+	user := os.Getenv("NEO4J_USER")
+	pass := os.Getenv("NEO4J_PASS")
 
+	log.Println("Connecting to Neo4j ...")
 	ctx := context.Background()
 	driver, err := neo4j.NewDriverWithContext(host, neo4j.BasicAuth(user, pass, ""))
 
@@ -23,6 +26,12 @@ func newNeo4j() *Neo4jWrapper {
 		panic(err)
 	}
 
+	err = driver.VerifyConnectivity(ctx)
+	if err != nil {
+		panic(err)
+	}
+
+	log.Println("Succesfully connected to Neo4j")
 	return &Neo4jWrapper{driver: driver, ctx: ctx}
 }
 
@@ -30,8 +39,13 @@ func (conn *Neo4jWrapper) Close() {
 	conn.driver.Close(conn.ctx)
 }
 
-func (conn *Neo4jWrapper) Exec(sql string, params map[string]any) Summary {
-	result, err := neo4j.ExecuteQuery(conn.ctx, conn.driver, sql, params,
+func (conn *Neo4jWrapper) Exec(sql string, params ...map[string]any) Summary {
+	var data map[string]any
+	if len(params) > 0 {
+		data = params[0]
+	}
+
+	result, err := neo4j.ExecuteQuery(conn.ctx, conn.driver, sql, data,
 		neo4j.EagerResultTransformer,
 		neo4j.ExecuteQueryWithDatabase("neo4j"),
 	)
@@ -55,8 +69,13 @@ func (conn *Neo4jWrapper) Exec(sql string, params map[string]any) Summary {
 	}
 }
 
-func (conn *Neo4jWrapper) Query(sql string, params map[string]any) []Record {
-	results, err := neo4j.ExecuteQuery(conn.ctx, conn.driver, sql, params,
+func (conn *Neo4jWrapper) Query(sql string, params ...map[string]any) []Record {
+	var data map[string]any
+	if len(params) > 0 {
+		data = params[0]
+	}
+
+	results, err := neo4j.ExecuteQuery(conn.ctx, conn.driver, sql, data,
 		neo4j.EagerResultTransformer,
 		neo4j.ExecuteQueryWithDatabase("neo4j"),
 	)
@@ -73,8 +92,13 @@ func (conn *Neo4jWrapper) Query(sql string, params map[string]any) []Record {
 	return records
 }
 
-func (conn *Neo4jWrapper) QuerySingle(sql string, params map[string]any) Record {
-	results, err := neo4j.ExecuteQuery(conn.ctx, conn.driver, sql, params,
+func (conn *Neo4jWrapper) QuerySingle(sql string, params ...map[string]any) Record {
+	var data map[string]any
+	if len(params) > 0 {
+		data = params[0]
+	}
+
+	results, err := neo4j.ExecuteQuery(conn.ctx, conn.driver, sql, data,
 		neo4j.EagerResultTransformer,
 		neo4j.ExecuteQueryWithDatabase("neo4j"),
 	)

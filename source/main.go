@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"net/http"
 
 	"example.com/source/handlers"
@@ -11,5 +12,6 @@ func main() {
 
 	http.HandleFunc("/api", handlers.HandleIndex)
 
+	log.Println("Server starting on :8080")
 	http.ListenAndServe(":8080", nil)
 }

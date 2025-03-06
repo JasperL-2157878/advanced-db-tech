@@ -5,3 +5,4 @@
 # Folders and files
 .env
 build/
+data/

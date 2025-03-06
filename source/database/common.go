@@ -1,7 +1,7 @@
 package database
 
 type DatabasePool struct {
-	Pgsql *PostgreSQLWrapper
+	Pgsql *PostgresWrapper
 	Neo4j *Neo4jWrapper
 }
 
@@ -24,8 +24,8 @@ type Summary struct {
 }
 
 type DatabaseWrapper interface {
-	Exec(sql string, params map[string]any) Summary
-	Query(sql string, params map[string]any) []Record
-	QuerySingle(sql string, params map[string]any) Record
+	Exec(sql string, params ...map[string]any) Summary
+	Query(sql string, params ...map[string]any) []Record
+	QuerySingle(sql string, params ...map[string]any) Record
 	Close()
 }
