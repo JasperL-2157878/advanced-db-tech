@@ -18,7 +18,7 @@ func newNeo4j() *Neo4jWrapper {
 	user := os.Getenv("NEO4J_USER")
 	pass := os.Getenv("NEO4J_PASS")
 
-	log.Println("Connecting to Neo4j ...")
+	log.Println("[INFO] Connecting to Neo4j ...")
 	ctx := context.Background()
 	driver, err := neo4j.NewDriverWithContext(host, neo4j.BasicAuth(user, pass, ""))
 
@@ -31,7 +31,6 @@ func newNeo4j() *Neo4jWrapper {
 		panic(err)
 	}
 
-	log.Println("Succesfully connected to Neo4j")
 	return &Neo4jWrapper{driver: driver, ctx: ctx}
 }
 

@@ -18,7 +18,7 @@ func newPostgreSQL() *PostgresWrapper {
 	password := os.Getenv("POSTGRES_PASSWORD")
 	dbname := os.Getenv("POSTGRES_DB")
 
-	log.Println("Connecting to Postgres ...")
+	log.Println("[INFO] Connecting to Postgres ...")
 	connstr := fmt.Sprintf("postgres://%s:%s@postgres/%s?sslmode=disable", user, password, dbname)
 	driver, err := sql.Open("postgres", connstr)
 	if err != nil {
@@ -30,7 +30,6 @@ func newPostgreSQL() *PostgresWrapper {
 		panic(err)
 	}
 
-	log.Println("Succesfully connected to Postgres")
 	return &PostgresWrapper{
 		driver: driver,
 	}

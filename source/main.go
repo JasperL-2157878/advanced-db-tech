@@ -12,6 +12,6 @@ func main() {
 
 	http.HandleFunc("/api", handlers.HandleIndex)
 
-	log.Println("Server starting on :8080")
+	log.Println("[INFO] Server listening on port 8080")
 	http.ListenAndServe(":8080", nil)
 }
