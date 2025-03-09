@@ -10,7 +10,7 @@ services:
     image: "adt:latest"
     container_name: "app"
     command: sh -c "
-        ./docker/scripts/build_and_run.sh
+        ./docker/scripts/deploy.sh
       "
     volumes:
       - "..:/app"
@@ -23,6 +23,9 @@ services:
     build: 
       context: ..
       dockerfile: docker/Dockerfile.postgres
+      args:
+        TELEATLAS_DOWNLOAD: ${TELEATLAS_DOWNLOAD}
+    image: "postgis:custom"
     container_name: postgres
     restart: always
     shm_size: 128mb

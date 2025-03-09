@@ -1,4 +1,25 @@
 FROM postgis/postgis
 
+ARG TELEATLAS_DOWNLOAD
+
+# Set locale
 RUN localedef -i nl_BE -c -f ISO-8859-1 -A /usr/share/locale/locale.alias nl_BE.ISO-8859-1
 ENV LANG nl_BE.ISO-8859-1
+
+# Download dataset
+RUN apt update
+RUN apt upgrade -y
+RUN apt install -y wget
+RUN mkdir /tmp/teleatlas
+RUN wget ${TELEATLAS_DOWNLOAD} -P /tmp/teleatlas
+RUN tar -xzvf /tmp/teleatlas/teleatlas.tar.gz -C /tmp/teleatlas
+
+# Download ogr2ogr
+RUN apt install -y gdal-bin
+
+# Download pgrouting extension
+RUN apt install -y postgresql-common
+RUN yes '' | /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh
+RUN apt install -y postgresql-17-pgrouting
+
+COPY ./docker/scripts/postgres /docker-entrypoint-initdb.d
