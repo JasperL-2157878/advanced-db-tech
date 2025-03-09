@@ -8,6 +8,8 @@ import (
 )
 
 func main() {
+	defer handlers.Db.Close()
+
 	http.Handle("/", http.FileServer(http.Dir("public")))
 
 	http.HandleFunc("/api", handlers.HandleIndex)

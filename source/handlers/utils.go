@@ -3,10 +3,10 @@ package handlers
 import (
 	"encoding/json"
 
-	"example.com/source/database"
+	db "example.com/source/database"
 )
 
-var Db *database.DatabasePool = database.Connect()
+var Db *db.PostgresConnection = db.NewPostgresConnection()
 
 func JSON(data any) []byte {
 	payload, err := json.Marshal(data)

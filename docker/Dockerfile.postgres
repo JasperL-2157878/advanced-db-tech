@@ -1,0 +1,4 @@
+FROM postgis/postgis
+
+RUN localedef -i nl_BE -c -f ISO-8859-1 -A /usr/share/locale/locale.alias nl_BE.ISO-8859-1
+ENV LANG nl_BE.ISO-8859-1

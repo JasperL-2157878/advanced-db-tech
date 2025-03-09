@@ -5,4 +5,4 @@
 # Folders and files
 .env
 build/
-data/
+docker/data
