@@ -10,7 +10,7 @@ import (
 )
 
 type PostgresConnection struct {
-	driver *sql.DB
+	conn *sql.DB
 }
 
 func NewPostgresConnection() *PostgresConnection {
@@ -31,10 +31,10 @@ func NewPostgresConnection() *PostgresConnection {
 	}
 
 	return &PostgresConnection{
-		driver: driver,
+		driver,
 	}
 }
 
-func (conn *PostgresConnection) Close() {
-	conn.driver.Close()
+func (pg *PostgresConnection) Close() {
+	pg.conn.Close()
 }

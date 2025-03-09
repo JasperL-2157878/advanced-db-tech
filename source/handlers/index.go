@@ -5,7 +5,5 @@ import (
 )
 
 func HandleIndex(res http.ResponseWriter, req *http.Request) {
-	res.Write(JSON(map[string]any{
-		"Hello": "World",
-	}))
+	res.Write(Db.Example())
 }
