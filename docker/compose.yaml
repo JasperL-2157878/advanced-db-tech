@@ -10,7 +10,7 @@ services:
     image: "adt:latest"
     container_name: "app"
     command: sh -c "
-        ./docker/scripts/deploy.sh
+        ./docker/scripts/app/deploy.sh
       "
     volumes:
       - "..:/app"
