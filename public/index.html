@@ -4,17 +4,41 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link rel="stylesheet" href="style.css">
-
+    <link rel="stylesheet" href="https://fonts.xz.style/serve/inter.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@exampledev/new.css@1.1.2/new.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 </head>
 <body>
-    <h1>Hello, world!</h1>
-    <div id="map" style="height: 500px;">
 
-    </div>
+    <header>
+        <h1>Hello, world!</h1>
+        <nav>
+            <a href="/">Demo</a> /
+            <a href="/benchmark.html">Benchmark</a>
+        </nav>
+    </header>
+
+    <main>
+
+        <fieldset>
+            <legend>Navigation</legend>
+
+            <label for="from">From:</label>
+            <input list="from-address-list" id="from" name="from" placeholder="21 Erkestraat 3910 PELT"/>
+            <datalist id="from-address-list"></datalist>
+
+            <label for="to">To:</label>
+            <input list="to-address-list" id="to" name="to" placeholder="Agoralaan 3590 DIEPENBEEK"/>
+            <datalist id="to-address-list"></datalist>
+        </fieldset>
+
+        <div id="map" style="height: 500px; border-radius: 4px;"></div>      
+
+    </main>
+
 </body>
 
-<script src="./scripts/map.js"></script>
+<script src="/scripts/map.js"></script>
+<!-- <script src="/scripts/geocode.js"></script> -->
 </html>
