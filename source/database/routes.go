@@ -10,6 +10,8 @@ func (pg *PostgresConnection) Example() []byte {
 		      
 		      nw.gid,
 		      nw.name,
+		      nw.meters,
+		      nl.fow,
 		      
 		      CASE
 		          WHEN pgr.node = nw.f_jnctid THEN nw.geom
@@ -38,6 +40,7 @@ func (pg *PostgresConnection) Example() []byte {
 		      true
 		    )
 		  ) AS pgr ON nw.gid = pgr.edge
+		  LEFT JOIN nl ON nw.id = nl.id
 		  ORDER BY pgr.seq
 		),
 		include_previous_route AS (
@@ -52,10 +55,16 @@ func (pg *PostgresConnection) Example() []byte {
 		    *,
 		    CAST(degrees(ST_Azimuth(
 		      ST_StartPoint(line_geom),
-    		  ST_PointN(line_geom, 2)
+		      CASE
+		          WHEN ST_NPoints(line_geom) = 2 THEN ST_PointN(line_geom, 2)
+		          ELSE ST_PointN(line_geom, 3)
+		      END
 		    )) AS numeric) AS current_angle,
 		    CAST(degrees(ST_Azimuth(
-		      ST_PointN(prev_line_geom, ST_NPoints(prev_line_geom) - 1),
+		      CASE
+		          WHEN ST_NPoints(prev_line_geom) = 2 THEN ST_PointN(prev_line_geom, ST_NPoints(prev_line_geom) - 1)
+		          ELSE ST_PointN(prev_line_geom, ST_NPoints(prev_line_geom) - 2)
+		      END,
          	  ST_EndPoint(prev_line_geom)
 		    )) AS numeric) AS prev_angle
 		  FROM include_previous_route
@@ -65,20 +74,9 @@ func (pg *PostgresConnection) Example() []byte {
 		    *,
 		    CASE 
 		      WHEN prev_angle IS NULL THEN NULL
-		      ELSE mod(current_angle - prev_angle + 180, 360) - 180 
+		      ELSE (current_angle - prev_angle + 180 + 360) % 360 - 180
 		    END AS angle_diff
 		  FROM angles
-		),
-		directions AS (
-		  SELECT
-		    *,
-		    CASE
-		      WHEN angle_diff IS NULL THEN NULL
-		      WHEN angle_diff > 45 THEN 'Turn Right'
-		      WHEN angle_diff < -45 THEN 'Turn Left'
-		      ELSE 'Go Straight'
-		    END AS direction
-		  FROM diff_angles
 		)
 		SELECT json_build_object(
 		  'type', 'FeatureCollection',
@@ -89,13 +87,14 @@ func (pg *PostgresConnection) Example() []byte {
 		      'properties', json_build_object(
 		        'gid', gid,
 		        'street_name', name,
-		        'direction', direction,
+		        'distance', meters,
+		        'fow', fow,
 		        'angle_diff', angle_diff
 		      )
 		    ) ORDER BY seq
 		  )
 		) AS geojson
-		FROM directions;
+		FROM diff_angles;
 	`)
 
 	var json []byte
