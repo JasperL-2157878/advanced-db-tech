@@ -18,10 +18,24 @@ func (pg *PostgresConnection) Example() []byte {
 		  FROM nw
 		  JOIN (
 		    SELECT * FROM pgr_dijkstra(
-		      'SELECT gid AS id, f_jnctid AS source, t_jnctid AS target, meters AS cost, meters AS reverse_cost FROM nw',
+		      'SELECT 
+				nw.gid AS id, 
+				f_jnctid AS source, 
+				t_jnctid AS target, 
+				CASE
+				  WHEN COALESCE(nl.oneway, '''') = ''FT'' THEN minutes
+				  WHEN COALESCE(nl.oneway, '''') = ''TF'' THEN -1
+				  ELSE minutes
+				END AS cost,
+				CASE
+				  WHEN COALESCE(nl.oneway, '''') = ''FT'' THEN -1
+				  WHEN COALESCE(nl.oneway, '''') = ''TF'' THEN minutes
+				  ELSE minutes
+				END AS reverse_cost
+				FROM nw LEFT JOIN nl ON nw.id = nl.id',
 		      10560298937508,
 		      10560298942473,
-		      false
+		      true
 		    )
 		  ) AS pgr ON nw.gid = pgr.edge
 		  ORDER BY pgr.seq
