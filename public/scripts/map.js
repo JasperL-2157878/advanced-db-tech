@@ -40,6 +40,18 @@ function addMarker(map, lat, long, start) {
     )
 }
 
+function removeLayers(map) {
+    if (currentLocationLayer) {
+        map.removeLayer(currentLocationLayer);
+    }
+
+    markers.forEach(marker => {
+        map.removeLayer(marker);
+    });
+
+    markers = []
+}
+
 function addMarkers(map, json) {
     if ((json.features ?? []).length > 0) {
         const [long, lat] = json.features[0].geometry.coordinates[0][0]
@@ -53,9 +65,7 @@ function addMarkers(map, json) {
 }
 
 function loadJSON(map, json) {
-    if (loadedJSONLayer) {
-        map.removeLayer(loadedJSONLayer);
-    }
+    removeLayers(map)
 
     generateTurnByTurn(json)
     registerLocationEvents(map)
