@@ -65,6 +65,9 @@ function addRoundabout(element, exit, street) {
 
 function generateTurnByTurn(json) {
     const element = document.getElementById('route-steps');
+    while (element.firstChild) {
+        element.removeChild(element.firstChild);
+    }
 
     let isStart = true;
     let onRoundabout = false;
