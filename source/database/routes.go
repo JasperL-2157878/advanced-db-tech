@@ -11,6 +11,7 @@ func (pg *PostgresConnection) Example() []byte {
 		      nw.gid,
 		      nw.name,
 		      nw.meters,
+		      nl.minutes,
 		      nl.fow,
 		      
 		      CASE
@@ -87,9 +88,10 @@ func (pg *PostgresConnection) Example() []byte {
 		      'properties', json_build_object(
 		        'gid', gid,
 		        'street_name', name,
-		        'distance', meters,
 		        'fow', fow,
-		        'angle_diff', angle_diff
+		        'angle_diff', angle_diff,
+		        'distance', meters,
+		        'duration', minutes
 		      )
 		    ) ORDER BY seq
 		  )

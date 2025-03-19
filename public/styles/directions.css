@@ -1,0 +1,84 @@
+.route-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+}
+
+.route-title {
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.route-summary {
+    font-size: 18px;
+    font-weight: 500;
+}
+
+.route-steps {
+    position: relative;
+}
+
+.route-step {
+    display: flex;
+    position: relative;
+    margin-bottom: 30px;
+}
+
+.step-icon-container {
+    position: relative;
+    z-index: 2;
+}
+
+.step-icon {
+    width: 48px;
+    height: 48px;
+    @media (prefers-color-scheme: dark) {
+        background-color: #111111;
+    }
+    @media (prefers-color-scheme: light) {
+        background-color: #f6f8fa;
+    }
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 20px;
+}
+
+.step-content {
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 10px;
+}
+
+.step-instruction {
+    font-size: 18px;
+    font-weight: 500;
+}
+
+.step-details {
+    font-size: 16px;
+    text-align: right;
+}
+
+.timeline {
+    position: absolute;
+    top: 24px;
+    left: 24px;
+    width: 2px;
+    height: calc(100% - 48px);
+    z-index: 1;
+}
+
+/* Icons */
+.icon {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 0;
+}
