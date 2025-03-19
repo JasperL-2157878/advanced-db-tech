@@ -31,8 +31,8 @@ function registerLocationEvents(map) {
 function addMarker(map, lat, long, start) {
     const icon = L.icon({
         iconUrl: `icons/${start ? 'start' : 'finish'}.svg`,
-        iconSize: [35, 35],
-        iconAnchor: start ? [35 / 2, 35] : [9, 30],
+        iconSize: start ? [35, 35] : [30, 30],
+        iconAnchor: start ? [35 / 2, 36] : [2, 31],
     });
 
     markers.push(
