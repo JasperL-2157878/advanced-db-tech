@@ -1,8 +1,6 @@
 package db
 
-import "fmt"
-
-func (pg *PostgresConnection) Example() []byte {
+func (pg *PostgresConnection) Route(fromId int, toId int) []byte {
 	query := pg.conn.QueryRow(`
 		WITH route AS (
 		  SELECT 
@@ -36,8 +34,8 @@ func (pg *PostgresConnection) Example() []byte {
 				  ELSE minutes
 				END AS reverse_cost
 				FROM nw LEFT JOIN nl ON nw.id = nl.id',
-		      10560298937508,
-		      10560298942473,
+		      $1,
+		      $2,
 		      true
 		    )
 		  ) AS pgr ON nw.gid = pgr.edge
@@ -97,13 +95,12 @@ func (pg *PostgresConnection) Example() []byte {
 		  )
 		) AS geojson
 		FROM diff_angles;
-	`)
+	`, fromId, toId)
 
 	var json []byte
 	err := query.Scan(&json)
 	if err != nil {
-		fmt.Println(err)
-		return nil
+		panic(err)
 	}
 
 	return json

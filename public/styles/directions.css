@@ -8,6 +8,7 @@
 .route-title {
     font-size: 28px;
     font-weight: 700;
+    border: 0;
 }
 
 .route-summary {
@@ -33,17 +34,13 @@
 .step-icon {
     width: 48px;
     height: 48px;
-    @media (prefers-color-scheme: dark) {
-        background-color: #111111;
-    }
-    @media (prefers-color-scheme: light) {
-        background-color: #f6f8fa;
-    }
+    background-color: var(--nc-bg-2);
     border-radius: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
     margin-right: 20px;
+    border: 1px solid var(--nc-bg-3);
 }
 
 .step-content {
@@ -51,7 +48,6 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-top: 10px;
 }
 
 .step-instruction {

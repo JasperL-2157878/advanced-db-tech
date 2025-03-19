@@ -6,7 +6,7 @@
     <title>Document</title>
     <link rel="stylesheet" href="styles/directions.css">
     <link rel="stylesheet" href="https://fonts.xz.style/serve/inter.css" integrity="sha384-tmaXBGDXDylqHmGdj38lMQk2xeYhgDuaYTcFdBofHNPMW1C+rCYIy85wiTmfMQ4J" crossorigin="">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@exampledev/new.css@1.1.2/new.min.css" integrity="sha384-ikoruGLZ2sjn1G7WxO8h+lTywYYYT5mrjZIp56Q2j23cvUaYFakP5hEyL42fQtXS" crossorigin="">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@exampledev/new.css@1.1.3/new.min.css" integrity="sha256-uNfic2hX1FVcWmlSPAbQ8JdNA8KfYLi1gXCi8WZhev8=" crossorigin="anonymous">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 </head>
@@ -22,29 +22,32 @@
 
     <main>
 
-        <fieldset>
-            <legend>Navigation</legend>
+        <form action="" method="get">
+            <fieldset>
+                <legend>Navigation</legend>
+    
+                <label for="from">From:</label>
+                <input list="from-datalist" id="from" name="from"/>
+                <datalist id="from-datalist"></datalist>
+                
+                <label for="to">To:</label>
+                <input list="to-datalist" id="to" name="to"/>
+                <datalist id="to-datalist"></datalist>
 
-            <label for="from">From:</label>
-            <input list="from-address-list" id="from" name="from" placeholder="21 Erkestraat 3910 PELT"/>
-            <datalist id="from-address-list"></datalist>
+                <button>Route</button>
+            </fieldset>
+        </form>
 
-            <label for="to">To:</label>
-            <input list="to-address-list" id="to" name="to" placeholder="Agoralaan 3590 DIEPENBEEK"/>
-            <datalist id="to-address-list"></datalist>
-        </fieldset>
+        <div id="map" style="height: 500px; border-radius: 4px; margin-bottom: 1rem;"></div>
 
-        <div id="map" style="height: 500px; border-radius: 4px;"></div>
-
+        
         <div>
             <div class="route-header">
                 <h1 class="route-title">Route Overview</h1>
                 <div class="route-summary" id="route-summary"></div>
             </div>
-
-            <div class="route-steps" id="route-steps">
-
-            </div>
+            
+            <div class="route-steps" id="route-steps"></div>
         </div>
 
     </main>
@@ -52,6 +55,6 @@
 </body>
 
 <script src="scripts/directions.js"></script>
-<script src="scripts/map.js"></script>
-<!-- <script src="/scripts/geocode.js"></script> -->
+<script src="/scripts/map.js"></script>
+<script src="/scripts/geocode.js"></script>
 </html>

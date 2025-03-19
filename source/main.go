@@ -19,7 +19,8 @@ func main() {
 
 	http.Handle("/", http.FileServer(http.Dir("public")))
 
-	http.HandleFunc("/api", JSON(handlers.HandleIndex))
+	http.HandleFunc("/api/v1/route", JSON(handlers.HandleRoute))
+	http.HandleFunc("/api/v1/geocode", JSON(handlers.HandleGeocode))
 
 	log.Println("[INFO] Server listening on port 8080")
 	http.ListenAndServe(":8080", nil)
