@@ -45,6 +45,10 @@ function removeLayers(map) {
         map.removeLayer(currentLocationLayer);
     }
 
+    if (loadedJSONLayer) {
+        map.removeLayer(loadedJSONLayer);
+    }
+
     markers.forEach(marker => {
         map.removeLayer(marker);
     });
