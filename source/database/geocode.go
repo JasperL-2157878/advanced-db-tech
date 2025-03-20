@@ -1,6 +1,12 @@
 package db
 
-func (pg *PostgresConnection) Geocode(street string, number int, postal string, city string) []byte {
+import (
+	"regexp"
+	"strconv"
+)
+
+func (pg *PostgresConnection) Geocode(address string) []byte {
+	street, number, postal, city := pg.parseAddress(address)
 	query := pg.conn.QueryRow(`
 		SELECT json_agg(
 		  json_build_object(
@@ -31,7 +37,7 @@ func (pg *PostgresConnection) Geocode(street string, number int, postal string, 
  		  )
 		)
 		FROM (
-		  SELECT DISTINCT ON (gc.fullname, gc.l_axon, gc.l_f_add, gc.l_t_add, gc.r_f_add, gc.r_t_add)
+		  SELECT DISTINCT ON (gc.fullname, gc.l_axon)
 		    gc.id,
 		    gc.fullname,
 		    gc.l_axon,
@@ -47,20 +53,20 @@ func (pg *PostgresConnection) Geocode(street string, number int, postal string, 
 		  FROM gc JOIN nw ON gc.id = nw.id
 		  WHERE 
 		    UPPER(gc.fullname) LIKE UPPER($1) AND (
-			  $2 = 0 OR $2 BETWEEN LEAST(
+			  $2 = 0 OR (gc.l_f_add != -1 AND gc.r_f_add != -1 AND $2 BETWEEN LEAST(
 			    gc.l_f_add, gc.l_t_add, gc.r_f_add, gc.r_t_add
 			  ) AND GREATEST(
 			    gc.l_f_add, gc.l_t_add, gc.r_f_add, gc.r_t_add
-			  )
+			  ))
 		    )
 		    AND 
-		    ($3 = '' OR ($3 = gc.l_pc OR $3 = gc.r_pc))
+		    ($3 = '' OR (gc.l_pc LIKE $3 OR gc.r_pc LIKE $3))
 		    AND
-		    ($4 = '' OR (UPPER($4) = UPPER(gc.l_axon) OR UPPER($4) = UPPER(gc.r_axon)))
-		  ORDER BY gc.fullname, gc.l_axon ASC
+		    ($4 = '' OR (UPPER(gc.l_axon) LIKE UPPER($4) OR UPPER(gc.r_axon) LIKE UPPER($4)))
+		  ORDER BY gc.fullname, gc.l_axon, gc.id ASC
 		  LIMIT 10
 		)
-	`, street+"%", number, postal, city)
+	`, street+"%", number, postal+"%", city+"%")
 
 	var json []byte
 	err := query.Scan(&json)
@@ -68,5 +74,26 @@ func (pg *PostgresConnection) Geocode(street string, number int, postal string, 
 		panic(err)
 	}
 
+	if len(json) == 0 {
+		return []byte("[]")
+	}
+
 	return json
+}
+
+func (pg *PostgresConnection) parseAddress(address string) (street string, number int, postal string, city string) {
+	re := regexp.MustCompile(`^(?P<street>[^0-9,]+)\s*(?P<number>\d+)?[,\s]*(?P<postal>\d{4})?\s*(?P<city>\D+)?$`)
+
+	matches := re.FindStringSubmatch(address)
+	street = matches[re.SubexpIndex("street")]
+	number, _ = strconv.Atoi(matches[re.SubexpIndex("number")])
+	postal = matches[re.SubexpIndex("postal")]
+	city = matches[re.SubexpIndex("city")]
+
+	println("street:", "\""+street+"\"")
+	println("number:", number)
+	println("postal:", "\""+postal+"\"")
+	println("city:", "\""+city+"\"")
+
+	return
 }

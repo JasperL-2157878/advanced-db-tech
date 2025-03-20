@@ -12,11 +12,13 @@ func validateRouteParams(params url.Values) bool {
 	valid = valid && params.Has("from")
 	valid = valid && params.Has("to")
 
-	if _, err := strconv.Atoi(params.Get("from")); err == nil {
+	if _, err := strconv.Atoi(params.Get("from")); err != nil {
+		println("invalid from")
 		valid = false
 	}
 
-	if _, err := strconv.Atoi(params.Get("to")); err == nil {
+	if _, err := strconv.Atoi(params.Get("to")); err != nil {
+		println("invalid to")
 		valid = false
 	}
 
@@ -24,11 +26,6 @@ func validateRouteParams(params url.Values) bool {
 }
 
 func validateGeocodeParams(params url.Values) bool {
-	if !params.Has("address") {
-		return false
-	}
-
-	re := regexp.MustCompile(`^([A-Za-zÀ-ÿ]+)(\s*)((\d*)?)(\s*)(,?)(\s*)((\d{4})?)(\s*)(([A-Za-zÀ-ÿ]+)?)(\s*)$`)
-
+	re := regexp.MustCompile(`^(?P<street_name>[^0-9,]+)\s*(?P<street_number>\d+)?[,\s]*(?P<postal_code>\d{4})?\s*(?P<city_name>\D+)?$`)
 	return re.MatchString(params.Get("address"))
 }

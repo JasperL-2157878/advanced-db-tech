@@ -34,8 +34,8 @@ func (pg *PostgresConnection) Route(fromId int, toId int) []byte {
 				  ELSE minutes
 				END AS reverse_cost
 				FROM nw LEFT JOIN nl ON nw.id = nl.id',
-		      $1,
-		      $2,
+		      CAST($1 AS BIGINT),
+		      CAST($2 AS BIGINT),
 		      true
 		    )
 		  ) AS pgr ON nw.gid = pgr.edge
@@ -100,6 +100,7 @@ func (pg *PostgresConnection) Route(fromId int, toId int) []byte {
 	var json []byte
 	err := query.Scan(&json)
 	if err != nil {
+		println("fuck")
 		panic(err)
 	}
 
