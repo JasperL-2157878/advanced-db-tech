@@ -81,29 +81,25 @@ function generateTurnByTurn(json) {
         const streetChanged = feature.properties.street_name !== currentStreet;
 
         if (streetChanged) {
-            if (currentStreet && currentElement) {
+            if (currentStreet && currentElement && !onRoundabout) {
                 addStepDetails(currentElement, accumulatedMeters, accumulatedMinutes);
+
+                accumulatedMeters = 0;
+                accumulatedMinutes = 0;
             }
 
             currentStreet = feature.properties.street_name;
-
-            accumulatedMeters = feature.properties.distance;
-            accumulatedMinutes = feature.properties.duration;
-
-            totalMeters += accumulatedMeters;
-            totalMinutes += accumulatedMinutes;
-
             if (isStart) {
                 isStart = false;
                 currentElement = addStep(element, "start", `Start` + (currentStreet ? ` on ${currentStreet}` : ''));
             }
-        } else {
-            accumulatedMeters += feature.properties.distance;
-            accumulatedMinutes += feature.properties.duration;
-
-            totalMeters += feature.properties.distance;
-            totalMinutes += feature.properties.duration;
         }
+
+        accumulatedMeters += feature.properties.distance;
+        totalMeters += feature.properties.distance;
+
+        accumulatedMinutes += feature.properties.duration;
+        totalMinutes += feature.properties.duration;
 
         if (feature.properties.fow === 4) {
             onRoundabout = true;
