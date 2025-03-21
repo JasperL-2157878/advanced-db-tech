@@ -36,7 +36,7 @@ func (pg *PostgresConnection) Route(fromId int, toId int) []byte {
 				FROM nw LEFT JOIN nl ON nw.id = nl.id',
 		      CAST($1 AS BIGINT),
 		      CAST($2 AS BIGINT),
-		      false
+		      true
 		    )
 		  ) AS pgr ON nw.gid = pgr.edge
 		  LEFT JOIN nl ON nw.id = nl.id
