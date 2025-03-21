@@ -24,7 +24,6 @@ func HandleGeocode(res http.ResponseWriter, req *http.Request) {
 	params := req.URL.Query()
 
 	if !validateGeocodeParams(params) {
-		println("invalid")
 		res.Write([]byte("[]"))
 		return
 	}
