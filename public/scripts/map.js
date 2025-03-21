@@ -1,6 +1,7 @@
 let loadedJSONLayer = null;
 let currentLocationLayer = null;
 let markers = []
+let locationSet = false;
 
 function addOpenStreetMaps(map) {
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom: 19}).addTo(map);
@@ -19,8 +20,9 @@ function onLocationFound(map, e) {
 
     currentLocationLayer = L.circle(e.latlng, e.accuracy).addTo(map);
 
-    if (loadedJSONLayer === null) {
+    if (loadedJSONLayer === null && !locationSet) {
         map.setView(e.latlng, 15);
+        locationSet = true;
     }
 }
 
