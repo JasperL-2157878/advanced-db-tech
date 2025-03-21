@@ -42,7 +42,7 @@ function addStepDetails(element, distance, duration) {
 
 function addIcon(element, icon) {
     const iconContainer = document.createElement('div');
-    iconContainer.className="step-icon-containers"
+    iconContainer.className = "step-icon-containers"
     element.appendChild(iconContainer);
 
     const stepIconElement = document.createElement('div')
@@ -56,11 +56,7 @@ function addIcon(element, icon) {
 }
 
 function addRoundabout(element, exit, street) {
-    return addStep(
-        element,
-        "roundabout-" + Math.min(3, Math.max(1, exit)),
-        `Take the ${exit} exit onto ${street}`
-    )
+    return addStep(element, "roundabout-" + Math.min(3, Math.max(1, exit)), `Take the ${exit} exit` + (street ? ` onto ${street}` : ''))
 }
 
 function generateTurnByTurn(json) {
@@ -99,7 +95,7 @@ function generateTurnByTurn(json) {
 
             if (isStart) {
                 isStart = false;
-                currentElement = addStep(element, "start", `Start on ${currentStreet}`);
+                currentElement = addStep(element, "start", `Start` + (currentStreet ? ` on ${currentStreet}` : ''));
             }
         } else {
             accumulatedMeters += feature.properties.distance;
@@ -121,20 +117,20 @@ function generateTurnByTurn(json) {
             } else if (streetChanged) {
                 switch (getDirectionFromAngle(feature.properties.angle_diff)) {
                     case 'left':
-                        currentElement = addStep(element, "left", `Turn left onto ${currentStreet}`);
+                        currentElement = addStep(element, "left", `Turn left` + (currentStreet ? ` onto ${currentStreet}` : ''));
                         break;
                     case 'right':
-                        currentElement = addStep(element, "right", `Turn right onto ${currentStreet}`);
+                        currentElement = addStep(element, "right", `Turn right` + (currentStreet ? ` onto ${currentStreet}` : ''));
                         break;
                     case 'straight':
-                        currentElement = addStep(element, "straight", `Go straight onto ${currentStreet}`);
+                        currentElement = addStep(element, "straight", `Go straight` + (currentStreet ? ` onto ${currentStreet}` : ''));
                         break;
                 }
             }
         }
     });
 
-    addStep(element, "finish", `Finish on ${currentStreet}`);
+    addStep(element, "finish", `Finish` + (currentStreet ? ` on ${currentStreet}` : ''));
     addStepDetails(currentElement, accumulatedMeters, accumulatedMinutes);
 
     setRouteSummary(totalMeters, totalMinutes);
