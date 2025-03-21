@@ -95,8 +95,9 @@ func (pg *PostgresConnection) Geocode(address string) []byte {
           CASE
             WHEN $2 = '' THEN NULL
             ELSE gc.l_t_add
-          END
-  	      NULLS LAST
+          END,
+		  gc.id 
+      	  ASC NULLS LAST
         LIMIT 10
       )
 	`, street, number, postal, city)
