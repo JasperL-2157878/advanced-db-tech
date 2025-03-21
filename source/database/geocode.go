@@ -48,7 +48,7 @@ func (pg *PostgresConnection) Geocode(address string) []byte {
               WHEN $2 = '' THEN NULL
               ELSE gc.l_t_add
             END
-		  )
+		      )
           gc.id,
           gc.fullname,
           gc.l_axon,
@@ -68,12 +68,12 @@ func (pg *PostgresConnection) Geocode(address string) []byte {
             $2 = '' OR (
               gc.l_f_add != -1 AND gc.r_f_add != -1 AND 
   	          EXISTS (
-	            SELECT numbers
-	            FROM generate_series(
-	              LEAST(gc.l_f_add, gc.l_t_add, gc.r_f_add, gc.r_t_add),
-	              GREATEST(gc.l_f_add, gc.l_t_add, gc.r_f_add, gc.r_t_add)
-	            ) AS numbers
-	            WHERE numbers::TEXT LIKE CONCAT($2, '%')
+	              SELECT numbers
+	              FROM generate_series(
+	                LEAST(gc.l_f_add, gc.l_t_add, gc.r_f_add, gc.r_t_add),
+	                GREATEST(gc.l_f_add, gc.l_t_add, gc.r_f_add, gc.r_t_add)
+	              ) AS numbers
+	              WHERE numbers::TEXT LIKE CONCAT($2, '%')
 	          )
             )
           )
