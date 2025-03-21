@@ -24,13 +24,13 @@ func (pg *PostgresConnection) Route(fromId int, toId int) []byte {
 				f_jnctid AS source, 
 				t_jnctid AS target, 
 				CASE
-				  WHEN COALESCE(nl.oneway, '''') = ''FT'' THEN minutes
-				  WHEN COALESCE(nl.oneway, '''') = ''TF'' THEN -1
+				  WHEN COALESCE(nl.oneway, '') = 'FT' THEN minutes
+				  WHEN COALESCE(nl.oneway, '') = 'TF' THEN -1
 				  ELSE minutes
 				END AS cost,
 				CASE
-				  WHEN COALESCE(nl.oneway, '''') = ''FT'' THEN -1
-				  WHEN COALESCE(nl.oneway, '''') = ''TF'' THEN minutes
+				  WHEN COALESCE(nl.oneway, '') = 'FT' THEN -1
+				  WHEN COALESCE(nl.oneway, '') = 'TF' THEN minutes
 				  ELSE minutes
 				END AS reverse_cost
 				FROM nw LEFT JOIN nl ON nw.id = nl.id',
@@ -100,7 +100,6 @@ func (pg *PostgresConnection) Route(fromId int, toId int) []byte {
 	var json []byte
 	err := query.Scan(&json)
 	if err != nil {
-		println("fuck")
 		panic(err)
 	}
 

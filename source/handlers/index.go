@@ -9,7 +9,6 @@ func HandleRoute(res http.ResponseWriter, req *http.Request) {
 	params := req.URL.Query()
 
 	if !validateRouteParams(params) {
-		println("valid")
 		res.Write([]byte(`{"type" : "FeatureCollection", "features" : null}`))
 		return
 	}

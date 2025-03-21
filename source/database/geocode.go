@@ -124,10 +124,5 @@ func (pg *PostgresConnection) parseAddress(address string) (street string, numbe
 	postal = strings.Trim(matches[re.SubexpIndex("postal")], " ")
 	city = strings.Trim(matches[re.SubexpIndex("city")], " ")
 
-	println("street:", "\""+street+"\"")
-	println("number:", "\""+number+"\"")
-	println("postal:", "\""+postal+"\"")
-	println("city:", "\""+city+"\"")
-
 	return
 }

@@ -13,12 +13,10 @@ func validateRouteParams(params url.Values) bool {
 	valid = valid && params.Has("to")
 
 	if _, err := strconv.Atoi(params.Get("from")); err != nil {
-		println("invalid from")
 		valid = false
 	}
 
 	if _, err := strconv.Atoi(params.Get("to")); err != nil {
-		println("invalid to")
 		valid = false
 	}
 
