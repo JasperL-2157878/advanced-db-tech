@@ -25,7 +25,7 @@ function addAddressOption(datalist, value, text) {
 }
 
 async function addAddressSuggestions(input, datalist) {
-    suggestions = await fetchJSON(`http://localhost:8080/api/v1/geocode?address=${input.value}`, []);
+    suggestions = await fetchJSON(window.location.origin + `/api/v1/geocode?address=${input.value}`, []);
     datalist.innerHTML = ''
 
     suggestions.forEach(s => {
@@ -89,7 +89,7 @@ routeFrom.addEventListener('submit', async function (e) {
     routeSubmit.innerText = 'Loading';
     routeSubmit.toggleAttribute('disabled');
 
-    geojson = await fetchJSON(`http://localhost:8080/api/v1/route?from=${fromId}&to=${toId}`, {});
+    geojson = await fetchJSON(window.location.origin + `/api/v1/route?from=${fromId}&to=${toId}`, {});
 
     routeSubmit.innerText = 'Route';
     routeSubmit.toggleAttribute('disabled');
