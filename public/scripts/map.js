@@ -92,4 +92,5 @@ function zoomToData(map, data) {
 
 var map = L.map('map')
 addOpenStreetMaps(map);
+map.setView([50.9250399, 5.389659], 15);
 registerLocationEvents(map)
