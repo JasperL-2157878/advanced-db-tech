@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/json"
 	"net/http"
 	"strconv"
 )
@@ -16,7 +17,22 @@ func HandleRoute(res http.ResponseWriter, req *http.Request) {
 	from, _ := strconv.Atoi(params.Get("from"))
 	to, _ := strconv.Atoi(params.Get("to"))
 
-	res.Write(Db.Route(from, to))
+	route := Db.Route(from, to)
+
+	jsonBytes, err := json.Marshal(route)
+	if err != nil {
+		http.Error(res, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	_, err = res.Write(jsonBytes)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func Generate() {
+	Db.GenerateTNR(8)
 }
 
 func HandleGeocode(res http.ResponseWriter, req *http.Request) {

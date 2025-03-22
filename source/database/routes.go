@@ -1,6 +1,33 @@
 package db
 
-func (pg *PostgresConnection) Route(fromId int, toId int) []byte {
+import "encoding/json"
+
+type GeoJSON struct {
+	Type     string       `json:"type"`
+	Features []GeoFeature `json:"features"`
+}
+
+type GeoFeature struct {
+	Type       string        `json:"type"`
+	Geometry   GeoGeometry   `json:"geometry"`
+	Properties GeoProperties `json:"properties"`
+}
+
+type GeoGeometry struct {
+	Type        string        `json:"type"`
+	Coordinates [][][]float64 `json:"coordinates"`
+}
+
+type GeoProperties struct {
+	Gid        int     `json:"gid"`
+	StreetName string  `json:"street_name"`
+	Fow        int8    `json:"fow"`
+	AngleDiff  float64 `json:"angle_diff"`
+	Distance   float64 `json:"distance"`
+	Duration   float64 `json:"duration"`
+}
+
+func (pg *PostgresConnection) Route(fromId int, toId int) GeoJSON {
 	query := pg.conn.QueryRow(`
 		WITH route AS (
 		  SELECT 
@@ -97,11 +124,17 @@ func (pg *PostgresConnection) Route(fromId int, toId int) []byte {
 		FROM diff_angles;
 	`, fromId, toId)
 
-	var json []byte
-	err := query.Scan(&json)
+	var rawJson []byte
+	err := query.Scan(&rawJson)
 	if err != nil {
 		panic(err)
 	}
 
-	return json
+	var jsonValue GeoJSON
+	err = json.Unmarshal(rawJson, &jsonValue)
+	if err != nil {
+		panic(err)
+	}
+
+	return jsonValue
 }

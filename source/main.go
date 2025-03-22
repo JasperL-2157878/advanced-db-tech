@@ -22,6 +22,8 @@ func main() {
 	http.HandleFunc("/api/v1/route", JSON(handlers.HandleRoute))
 	http.HandleFunc("/api/v1/geocode", JSON(handlers.HandleGeocode))
 
+	handlers.Generate()
+	
 	log.Println("[INFO] Server listening on port 8080")
 	http.ListenAndServe(":8080", nil)
 }
