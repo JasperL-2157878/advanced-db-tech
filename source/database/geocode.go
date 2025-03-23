@@ -11,30 +11,18 @@ func (pg *PostgresConnection) Geocode(address string) []byte {
         SELECT
           json_agg(
             json_build_object(
-              'id',
-              id,
-              'fullname',
-              fullname,
-              'l_axon',
-              l_axon,
-              'l_pc',
-              l_pc,
-              'r_axon',
-              r_axon,
-              'r_pc',
-              r_pc,
-              'l_f_add',
-              l_f_add,
-              'l_t_add',
-              l_t_add,
-              'r_f_add',
-              r_f_add,
-              'r_t_add',
-              r_t_add,
-              'f_jnctid',
-              f_jnctid,
-              't_jnctid',
-              t_jnctid
+              'id', id,
+              'fullname', fullname,
+              'l_axon', l_axon,
+              'l_pc', l_pc,
+              'r_axon', r_axon,
+              'r_pc',r_pc,
+              'l_f_add', l_f_add,
+              'l_t_add', l_t_add,
+              'r_f_add', r_f_add,
+              'r_t_add', r_t_add,
+              'f_jnctid', f_jnctid,
+              't_jnctid', t_jnctid
             )
           )
         FROM (
@@ -48,7 +36,7 @@ func (pg *PostgresConnection) Geocode(address string) []byte {
               WHEN $2 = '' THEN NULL
               ELSE gc.l_t_add
             END
-		      )
+		)
           gc.id,
           gc.fullname,
           gc.l_axon,

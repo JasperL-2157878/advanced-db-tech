@@ -37,17 +37,15 @@ func (pg *PostgresConnection) generateTNRPath(driveAway int, exit int) {
 		return
 	}
 
-	currentStreet := route.Features[0].Properties.StreetName
+	currentRouteNum := route.Features[0].Properties.RouteNum
 
 	for _, feature := range route.Features {
-		if feature.Properties.StreetName != currentStreet {
-			log.Println("Old street: %s", currentStreet)
-			log.Println("New street: %s", feature.Properties.StreetName)
+		if feature.Properties.RouteNum != currentRouteNum {
 			return
 		}
 	}
 
-	log.Println("TNR path found")
+	log.Println("Route found between %d and %d and total cost is %f", driveAway, exit, route.TotalCost)
 }
 
 func (pg *PostgresConnection) getDriveAways() []int {
@@ -57,7 +55,12 @@ func (pg *PostgresConnection) getDriveAways() []int {
 		    FROM nw
 		    WHERE frc = 0 OR routenum = 'R0'
 		)
-		SELECT nw.id
+		SELECT 
+		    CASE 
+		         WHEN nl.oneway = 'FT' THEN nw.t_jnctid
+		         WHEN nl.oneway = 'TF' THEN nw.f_jnctid
+		         ELSE NULL
+		    END AS junction_id
 		FROM nw
 		JOIN nl ON nw.id = nl.id
 		WHERE nw.frc <> 0
@@ -92,7 +95,11 @@ func (pg *PostgresConnection) getExits() []int {
 		    FROM nw
 		    WHERE frc = 0 OR routenum = 'R0'
 		)
-		SELECT nw.id
+		SELECT 
+		  CASE 
+		    WHEN nl.oneway = 'FT' THEN nw.f_jnctid
+		    WHEN nl.oneway = 'TF' THEN nw.t_jnctid
+		  END AS junction_id
 		FROM nw
 		JOIN nl ON nw.id = nl.id
 		WHERE nw.frc <> 0
@@ -105,7 +112,7 @@ func (pg *PostgresConnection) getExits() []int {
 		    (nl.oneway = 'FT' AND nw.f_jnctid IN (SELECT f_jnctid FROM Junctions))
 		    OR
 		    (nl.oneway = 'TF' AND nw.t_jnctid IN (SELECT f_jnctid FROM Junctions))
-		  )
+		  );
 	`)
 	if err != nil {
 		panic(err)

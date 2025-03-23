@@ -3,8 +3,9 @@ package db
 import "encoding/json"
 
 type GeoJSON struct {
-	Type     string       `json:"type"`
-	Features []GeoFeature `json:"features"`
+	Type      string       `json:"type"`
+	TotalCost float64      `json:"total_cost"`
+	Features  []GeoFeature `json:"features"`
 }
 
 type GeoFeature struct {
@@ -21,6 +22,7 @@ type GeoGeometry struct {
 type GeoProperties struct {
 	Gid        int     `json:"gid"`
 	StreetName string  `json:"street_name"`
+	RouteNum   string  `json:"route_num"`
 	Fow        int8    `json:"fow"`
 	AngleDiff  float64 `json:"angle_diff"`
 	Distance   float64 `json:"distance"`
@@ -32,10 +34,12 @@ func (pg *PostgresConnection) Route(fromId int, toId int) GeoJSON {
 		WITH route AS (
 		  SELECT 
 		      pgr.seq,
+		      pgr.agg_cost,
 		      
 		      nw.gid,
 		      nw.name,
 		      nw.meters,
+		      nw.routenum,
 		      nl.minutes,
 		      nl.fow,
 		      
@@ -106,6 +110,7 @@ func (pg *PostgresConnection) Route(fromId int, toId int) GeoJSON {
 		)
 		SELECT json_build_object(
 		  'type', 'FeatureCollection',
+		  'total_cost', (SELECT agg_cost FROM route ORDER BY seq DESC LIMIT 1),
 		  'features', json_agg(
 		    json_build_object(
 		      'type', 'Feature',
@@ -113,6 +118,7 @@ func (pg *PostgresConnection) Route(fromId int, toId int) GeoJSON {
 		      'properties', json_build_object(
 		        'gid', gid,
 		        'street_name', name,
+		        'route_num', routenum,
 		        'fow', fow,
 		        'angle_diff', angle_diff,
 		        'distance', meters,
