@@ -9,11 +9,11 @@ import (
 	_ "github.com/lib/pq"
 )
 
-type PostgresConnection struct {
-	conn *sql.DB
+type Postgres struct {
+	*sql.DB
 }
 
-func NewPostgresConnection() *PostgresConnection {
+func NewPostgres() *Postgres {
 	user := os.Getenv("POSTGRES_USER")
 	password := os.Getenv("POSTGRES_PASSWORD")
 	dbname := os.Getenv("POSTGRES_DB")
@@ -30,11 +30,7 @@ func NewPostgresConnection() *PostgresConnection {
 		panic(err)
 	}
 
-	return &PostgresConnection{
+	return &Postgres{
 		driver,
 	}
-}
-
-func (pg *PostgresConnection) Close() {
-	pg.conn.Close()
 }

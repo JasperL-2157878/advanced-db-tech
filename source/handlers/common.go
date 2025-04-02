@@ -4,4 +4,4 @@ import (
 	db "example.com/source/database"
 )
 
-var Db *db.PostgresConnection = db.NewPostgresConnection()
+var Db *db.Postgres = db.NewPostgres()

@@ -1,62 +1,88 @@
-package db
+package preprocessors
 
 import (
-	"log"
+	"encoding/csv"
+	"fmt"
+	"os"
 	"sync"
+
+	db "example.com/source/database"
 )
 
-func (pg *PostgresConnection) GenerateTNR(concurrency int) {
-	sem := make(chan struct{}, concurrency)
-	driveAways := pg.getDriveAways()
-	exits := pg.getExits()
+func GenerateTransitNodeRoutes(db *db.Postgres, concurrency int) {
+	file, err := os.Create("tnr.csv")
+	if err != nil {
+		panic(err)
+	}
 
-	log.Println("Drive aways amount: %d", len(driveAways))
-	log.Println("Exits amount: %d", len(exits))
+	w := csv.NewWriter(file)
+	w.Comma = 59 // ;
+	if err := w.Write([]string{"id", "source", "target", "cost", "reverse_cost", "via"}); err != nil {
+		panic(err)
+	}
+
+	id := -1
+
+	defer file.Close()
+	defer w.Flush()
+
+	sem := make(chan struct{}, concurrency)
+	driveways := getDriveways(db)
+	exits := getExits(db)
 
 	var wg sync.WaitGroup
-	for _, driveAway := range driveAways {
+	var mu sync.Mutex
+
+	for _, driveway := range driveways {
 		for _, exit := range exits {
 			sem <- struct{}{} // acquire slot
 			wg.Add(1)
 
-			go func(d, e int) {
+			go func(d, e int64) {
 				defer wg.Done()
 				defer func() { <-sem }() // release slot
-				pg.generateTNRPath(d, e)
-			}(driveAway, exit)
+
+				path := db.BdAstar(driveway, exit)
+				mu.Lock()
+				writeRow(w, id, driveway, exit, path)
+				id--
+				mu.Unlock()
+			}(driveway, exit)
 		}
 	}
+
 	wg.Wait()
 }
 
-func (pg *PostgresConnection) generateTNRPath(driveAway int, exit int) {
-	route := pg.Route(driveAway, exit)
-
-	if len(route.Features) == 0 {
-		log.Println("No route found between %d and %d", driveAway, exit)
-		return
+func writeRow(w *csv.Writer, id int, source int64, target int64, path db.Path) {
+	cost := 0.0
+	if len(path.Sequences) > 0 {
+		cost = path.Sequences[len(path.Sequences)-1].AggCost
 	}
 
-	currentRouteNum := route.Features[0].Properties.RouteNum
-
-	for _, feature := range route.Features {
-		if feature.Properties.RouteNum != currentRouteNum {
-			return
-		}
+	row := []string{
+		fmt.Sprintf("%d", id),
+		fmt.Sprintf("%d", source),
+		fmt.Sprintf("%d", target),
+		fmt.Sprintf("%f", cost),
+		"-1",           // reverse cost
+		path.ToArray(), // via
 	}
 
-	log.Println("Route found between %d and %d and total cost is %f", driveAway, exit, route.TotalCost)
+	if err := w.Write(row); err != nil {
+		panic(err)
+	}
 }
 
-func (pg *PostgresConnection) getDriveAways() []int {
-	rows, err := pg.conn.Query(`
+func getDriveways(db *db.Postgres) []int64 {
+	rows, err := db.Query(`
 		WITH Junctions AS (
 		    SELECT f_jnctid
 		    FROM nw
 		    WHERE frc = 0 OR routenum = 'R0'
 		)
-		SELECT 
-		    CASE 
+		SELECT
+		    CASE
 		         WHEN nl.oneway = 'FT' THEN nw.t_jnctid
 		         WHEN nl.oneway = 'TF' THEN nw.f_jnctid
 		         ELSE NULL
@@ -75,9 +101,9 @@ func (pg *PostgresConnection) getDriveAways() []int {
 		panic(err)
 	}
 
-	var ids []int
+	var ids []int64
 	for rows.Next() {
-		var id int
+		var id int64
 		err = rows.Scan(&id)
 		if err != nil {
 			panic(err)
@@ -88,15 +114,15 @@ func (pg *PostgresConnection) getDriveAways() []int {
 	return ids
 }
 
-func (pg *PostgresConnection) getExits() []int {
-	rows, err := pg.conn.Query(`
+func getExits(db *db.Postgres) []int64 {
+	rows, err := db.Query(`
 		WITH Junctions AS (
 		    SELECT f_jnctid
 		    FROM nw
 		    WHERE frc = 0 OR routenum = 'R0'
 		)
-		SELECT 
-		  CASE 
+		SELECT
+		  CASE
 		    WHEN nl.oneway = 'FT' THEN nw.f_jnctid
 		    WHEN nl.oneway = 'TF' THEN nw.t_jnctid
 		  END AS junction_id
@@ -118,9 +144,9 @@ func (pg *PostgresConnection) getExits() []int {
 		panic(err)
 	}
 
-	var ids []int
+	var ids []int64
 	for rows.Next() {
-		var id int
+		var id int64
 		err = rows.Scan(&id)
 		if err != nil {
 			panic(err)
