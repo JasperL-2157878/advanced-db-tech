@@ -30,13 +30,25 @@ function addStep(element, icon, text) {
 
 function setRouteSummary(distance, duration) {
     const element = document.getElementById('route-summary');
-    element.innerText = `${(distance / 1000).toFixed(2)} km • ${Math.ceil(duration)} min`;
+    console.log(distance, duration)
+    const meters = Math.ceil(distance)
+    const kms = (meters / 1000).toFixed(2)
+    const mins = Math.ceil(duration)
+    const hours = (mins/60).toFixed(2)
+
+    element.innerText = `${meters < 1000 ? meters : kms} ${meters < 1000 ? 'm' : 'km'} • ${mins < 60 ? mins : hours} ${mins < 60 ? 'min' : 'h'}`;
 }
 
 function addStepDetails(element, distance, duration) {
     const stepDetailsElement = document.createElement('div');
     stepDetailsElement.className = "step-details";
-    stepDetailsElement.innerText = `${(distance / 1000).toFixed(2)} km • ${Math.ceil(duration)} min`;
+
+    const meters = Math.ceil(distance)
+    const kms = (meters / 1000).toFixed(2)
+    const mins = Math.ceil(duration)
+    const hours = (mins/60).toFixed(2)
+
+    stepDetailsElement.innerText = `${meters < 1000 ? meters : kms} ${meters < 1000 ? 'm' : 'km'} • ${mins < 60 ? mins : hours} ${mins < 60 ? 'min' : 'h'}`;
     element.appendChild(stepDetailsElement);
 }
 
@@ -56,7 +68,7 @@ function addIcon(element, icon) {
 }
 
 function addRoundabout(element, exit, street) {
-    return addStep(element, "roundabout-" + Math.min(3, Math.max(1, exit)), `Take the ${exit} exit` + (street ? ` onto ${street}` : ''))
+    return addStep(element, "roundabout-" + Math.min(3, Math.max(1, exit)), `Take exit ${exit-1}` + (street ? ` onto ${street}` : ''))
 }
 
 function generateTurnByTurn(json) {
@@ -69,7 +81,6 @@ function generateTurnByTurn(json) {
     let onRoundabout = false;
 
     let totalMeters = 0;
-    let totalMinutes = 0;
     let accumulatedMeters = 0;
     let accumulatedMinutes = 0;
 
@@ -99,7 +110,6 @@ function generateTurnByTurn(json) {
         totalMeters += feature.properties.distance;
 
         accumulatedMinutes += feature.properties.duration;
-        totalMinutes += feature.properties.duration;
 
         if (feature.properties.fow === 4) {
             onRoundabout = true;
@@ -129,5 +139,5 @@ function generateTurnByTurn(json) {
     addStep(element, "finish", `Finish` + (currentStreet ? ` on ${currentStreet}` : ''));
     addStepDetails(currentElement, accumulatedMeters, accumulatedMinutes);
 
-    setRouteSummary(totalMeters, totalMinutes);
+    setRouteSummary(totalMeters, json.total_cost);
 }

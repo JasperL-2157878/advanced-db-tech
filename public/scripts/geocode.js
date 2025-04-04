@@ -5,14 +5,8 @@ const fromDatalist = document.getElementById('from-datalist');
 const toInput = document.getElementById('to');
 const toDatalist = document.getElementById('to-datalist');
 
-document.addEventListener("DOMContentLoaded", function () {
-    const from = localStorage.getItem("from") ?? "";
-    const to = localStorage.getItem("to") ?? "";
-
-    fromInput.value = from;
-    toInput.value = to;
-});
-
+let from = '';
+let to = '';
 let fromTimeoutID;
 let toTimeoutID;
 
@@ -80,22 +74,18 @@ routeFrom.addEventListener('submit', async function (e) {
     e.preventDefault();
 
     let params = new URLSearchParams(window.location.search);
-    let fromId = params.get('from') ?? '';
-    let toId = params.get('to') ?? '';
 
     Array.from(fromDatalist.children).forEach(option => {
         if (option.value == fromInput.value) {
-            fromId = option.innerText;
-            params.set("from", fromId);
-            localStorage.setItem("from", option.value);
+            from = option.innerText;
+            params.set("from", from);
         }
     });
 
     Array.from(toDatalist.children).forEach(option => {
         if (option.value == toInput.value) {
-            toId = option.innerText;
-            params.set("to", toId)
-            localStorage.setItem("to", option.value);
+            to = option.innerText;
+            params.set("to", to)
         }
     });
     
@@ -104,7 +94,7 @@ routeFrom.addEventListener('submit', async function (e) {
     routeSubmit.innerText = 'Loading';
     routeSubmit.toggleAttribute('disabled');
 
-    geojson = await fetchJSON(window.location.origin + `/api/v1/route/bddijkstra?from=${fromId}&to=${toId}`, {});
+    geojson = await fetchJSON(window.location.origin + `/api/v1/route/opt/tnr?from=${from}&to=${to}`, {});
 
     routeSubmit.innerText = 'Route';
     routeSubmit.toggleAttribute('disabled');

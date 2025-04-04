@@ -1,13 +1,14 @@
 package handlers
 
 import (
-	"net/url"
 	"regexp"
 	"strconv"
 )
 
-func validateRouteParams(params url.Values) bool {
+func (c Context) validateRouteParams() bool {
 	var valid bool = true
+
+	params := c.req.URL.Query()
 
 	valid = valid && params.Has("from")
 	valid = valid && params.Has("to")
@@ -23,7 +24,9 @@ func validateRouteParams(params url.Values) bool {
 	return valid
 }
 
-func validateGeocodeParams(params url.Values) bool {
+func (c Context) validateGeocodeParams() bool {
+	params := c.req.URL.Query()
+
 	re := regexp.MustCompile(`^(?P<street_name>[^0-9,]+)\s*(?P<street_number>\d+)?[,\s]*(?P<postal_code>\d{4})?\s*(?P<city_name>\D+)?$`)
 	return re.MatchString(params.Get("address"))
 }

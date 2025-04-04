@@ -3,9 +3,11 @@ package db
 import (
 	"regexp"
 	"strings"
+
+	"example.com/source/types"
 )
 
-func (db *Postgres) Geocode(address string) JSON {
+func (db *Postgres) Geocode(address string) types.JSON {
 	street, number, postal, city := db.parseAddress(address)
 	query := db.QueryRow(`        
         SELECT
@@ -90,17 +92,17 @@ func (db *Postgres) Geocode(address string) JSON {
         )
 	`, street, number, postal, city)
 
-	var json JSON
+	var json []byte
 	err := query.Scan(&json)
 	if err != nil {
 		panic(err)
 	}
 
 	if len(json) == 0 {
-		return JSON("[]")
+		return types.JSON("[]")
 	}
 
-	return json
+	return types.JSON(json)
 }
 
 func (db *Postgres) parseAddress(address string) (street string, number string, postal string, city string) {

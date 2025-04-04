@@ -1,5 +1,5 @@
 SELECT
-	nw.gid AS id, 
+	nw.gid AS id,
 	f_jnctid AS source, 
 	t_jnctid AS target, 
 	CASE
@@ -16,7 +16,7 @@ SELECT
 	ST_Y(ST_GeometryN(jcf.geom, 1)) AS y1,
 	ST_X(ST_GeometryN(jct.geom, 1)) AS x2,
 	ST_Y(ST_GeometryN(jct.geom, 1)) AS y2
-INTO fnw
+INTO base_graph
 FROM nw 
 	LEFT JOIN nl ON nw.id = nl.id
 	LEFT JOIN jc jcf ON nw.f_jnctid = jcf.id

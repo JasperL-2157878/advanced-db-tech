@@ -3,14 +3,15 @@ package db
 import (
 	"encoding/json"
 	"fmt"
+
+	"example.com/source/types"
 )
 
-func (db *Postgres) Route(path Path) GeoJSON {
+func (db *Postgres) Route(path *types.Path) types.GeoJSON {
 	query := db.QueryRow(fmt.Sprintf(`
 		WITH route AS (
 			SELECT 
 				path.seq,
-				path.agg_cost,
 				nw.gid,
 				nw.name,
 				nw.meters,
@@ -62,7 +63,7 @@ func (db *Postgres) Route(path Path) GeoJSON {
 		)
 		SELECT json_build_object(
 			'type', 'FeatureCollection',
-			'total_cost', (SELECT agg_cost FROM route ORDER BY seq DESC LIMIT 1),
+			'total_cost', %f,
 			'features', json_agg(
 				json_build_object(
 					'type', 'Feature',
@@ -80,15 +81,15 @@ func (db *Postgres) Route(path Path) GeoJSON {
 			)
 		) AS geojson
 		FROM diff_angles;
-	`, path.ToTable()))
+	`, path.ToTable(), path.Cost))
 
-	var rawJson []byte
+	var rawJson types.JSON
 	err := query.Scan(&rawJson)
 	if err != nil {
 		panic(err)
 	}
 
-	var jsonValue GeoJSON
+	var jsonValue types.GeoJSON
 	err = json.Unmarshal(rawJson, &jsonValue)
 	if err != nil {
 		panic(err)
@@ -97,46 +98,48 @@ func (db *Postgres) Route(path Path) GeoJSON {
 	return jsonValue
 }
 
-func (db *Postgres) path(alg string, from int64, to int64) Path {
+func (db *Postgres) Dijkstra(from int64, to int64) *types.Path {
+	return db.path("dijkstra", "base_graph", from, to)
+}
+
+func (db *Postgres) Astar(from int64, to int64) *types.Path {
+	return db.path("aStar", "base_graph", from, to)
+}
+
+func (db *Postgres) BdDijkstra(from int64, to int64) *types.Path {
+	return db.path("bdDijkstra", "base_graph", from, to)
+}
+
+func (db *Postgres) BdAstar(from int64, to int64) *types.Path {
+	return db.path("bdAstar", "base_graph", from, to)
+}
+
+func (db *Postgres) path(alg string, table string, from int64, to int64) *types.Path {
 	rows, err := db.Query(fmt.Sprintf(`
-		SELECT seq, node, edge, cost FROM pgr_%s(
-			'SELECT * FROM fnw',
+		SELECT node, edge FROM pgr_%s(
+			'SELECT * FROM %s',
 			CAST($1 AS BIGINT),
 			CAST($2 AS BIGINT),
 			true
 		)
-	`, alg), from, to)
+	`, alg, table), from, to)
 
 	if err != nil {
-		return Path{}
+		return &types.Path{}
 	}
 
-	var path Path
+	var path types.Path
 	for rows.Next() {
-		var segment PathSegment
-		err := rows.Scan(&segment.Seq, &segment.Node, &segment.Edge, &segment.AggCost)
+		var node int64
+		var edge int64
+		err := rows.Scan(&node, &edge)
 		if err != nil {
 			panic(err)
 		}
 
-		path.Sequences = append(path.Sequences, segment)
+		path.Nodes = append(path.Nodes, node)
+		path.Edges = append(path.Edges, edge)
 	}
 
-	return path
-}
-
-func (db *Postgres) Dijkstra(from int64, to int64) Path {
-	return db.path("dijkstra", from, to)
-}
-
-func (db *Postgres) Astar(from int64, to int64) Path {
-	return db.path("aStar", from, to)
-}
-
-func (db *Postgres) BdDijkstra(from int64, to int64) Path {
-	return db.path("bdDijkstra", from, to)
-}
-
-func (db *Postgres) BdAstar(from int64, to int64) Path {
-	return db.path("bdAstar", from, to)
+	return &path
 }
