@@ -116,7 +116,7 @@ func (db *Postgres) BdAstar(from int64, to int64) *types.Path {
 
 func (db *Postgres) path(alg string, table string, from int64, to int64) *types.Path {
 	rows, err := db.Query(fmt.Sprintf(`
-		SELECT node, edge FROM pgr_%s(
+		SELECT node, edge, agg_cost FROM pgr_%s(
 			'SELECT * FROM %s',
 			CAST($1 AS BIGINT),
 			CAST($2 AS BIGINT),
@@ -130,15 +130,17 @@ func (db *Postgres) path(alg string, table string, from int64, to int64) *types.
 
 	var path types.Path
 	for rows.Next() {
-		var node int64
-		var edge int64
-		err := rows.Scan(&node, &edge)
+		var node, edge int64
+		var aggCost float64
+
+		err := rows.Scan(&node, &edge, &aggCost)
 		if err != nil {
 			panic(err)
 		}
 
 		path.Nodes = append(path.Nodes, node)
 		path.Edges = append(path.Edges, edge)
+		path.Cost = aggCost
 	}
 
 	return &path
