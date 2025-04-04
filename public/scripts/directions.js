@@ -68,7 +68,7 @@ function addIcon(element, icon) {
 }
 
 function addRoundabout(element, exit, street) {
-    return addStep(element, "roundabout-" + Math.min(3, Math.max(1, exit)), `Take exit ${exit-1}` + (street ? ` onto ${street}` : ''))
+    return addStep(element, "roundabout-" + Math.min(3, Math.max(1, exit)), `Take exit ${exit}` + (street ? ` onto ${street}` : ''))
 }
 
 function generateTurnByTurn(json) {
