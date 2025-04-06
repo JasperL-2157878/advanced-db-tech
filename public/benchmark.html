@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test</title>
+    <title>Benchmark</title>
 </head>
 <body>
 
-    <h1>Test</h1>
+    <h1>Benchmark</h1>
 
     <h2>Optimizations</h2>
     <b>None</b>
@@ -23,11 +23,11 @@
         async function testOpt(opt, from, to, el) {
             const r = await fetch(window.location.origin + `/api/v1/route/opt/${opt}?from=${from}&to=${to}`).then(r => r.json());
 
-            queryTime = r.query_time/1_000_000
-            responseTime = r.response_time/1_000_000
+            queryTime = r.query_time_ns/1_000_000
+            responseTime = r.response_time_ns/1_000_000
             totalTime = queryTime + responseTime
 
-            el.innerHTML = `total: ${totalTime}<br>query: ${queryTime}<br>response: ${responseTime}`
+            el.innerHTML = `total: ${totalTime}ms<br>query: ${queryTime}ms<br>response: ${responseTime}ms`
         }
 
         document.addEventListener('DOMContentLoaded', () => {

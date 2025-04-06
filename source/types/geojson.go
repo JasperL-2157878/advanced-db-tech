@@ -9,8 +9,8 @@ type GeoJSON struct {
 	Type         string        `json:"type"`
 	TotalCost    float64       `json:"total_cost"`
 	Features     []GeoFeature  `json:"features"`
-	QueryTime    time.Duration `json:"query_time"`
-	ResponseTime time.Duration `json:"response_time"`
+	QueryTime    time.Duration `json:"query_time_ns"`
+	ResponseTime time.Duration `json:"response_time_ns"`
 }
 
 func (g *GeoJSON) ToBytes() []byte {
