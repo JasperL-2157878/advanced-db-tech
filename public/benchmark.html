@@ -9,6 +9,16 @@
 
     <h1>Benchmark</h1>
 
+    <h2>Algorithms</h2>
+    <b>Dijkstra</b>
+    <p id="result-alg-dijkstra"></p>
+    <b>A*</b>
+    <p id="result-alg-astar"></p>
+    <b>Bidirectional Dijkstra</b>
+    <p id="result-alg-bddijkstra"></p>
+    <b>Bidirectional A*</b>
+    <p id="result-alg-bdastar"></p>
+
     <h2>Optimizations</h2>
     <b>None</b>
     <p id="result-opt-none"></p>
@@ -20,8 +30,8 @@
     <p id="result-opt-chtnr"></p>
     
     <script>
-        async function testOpt(opt, from, to, el) {
-            const r = await fetch(window.location.origin + `/api/v1/route/opt/${opt}?from=${from}&to=${to}`).then(r => r.json());
+        async function test(route, from, to, el) {
+            const r = await fetch(window.location.origin + `/api/v1/route/${route}?from=${from}&to=${to}`).then(r => r.json());
 
             queryTime = r.query_time_ns/1_000_000
             responseTime = r.response_time_ns/1_000_000
@@ -34,10 +44,15 @@
             const from = 10560298930511;
             const to = 10560299626068;
 
-            testOpt('none', from, to, document.getElementById('result-opt-none'));
-            testOpt('tnr', from, to, document.getElementById('result-opt-tnr'));
-            testOpt('ch', from, to, document.getElementById('result-opt-ch'));
-            testOpt('chtnr', from, to, document.getElementById('result-opt-chtnr'));
+            setTimeout(() => test('alg/dijkstra', from, to, document.getElementById('result-alg-dijkstra')), 0);
+            setTimeout(() => test('alg/astar', from, to, document.getElementById('result-alg-astar')), 10000);
+            setTimeout(() => test('alg/bddijkstra', from, to, document.getElementById('result-alg-bddijkstra')), 20000);
+            setTimeout(() => test('alg/bdastar', from, to, document.getElementById('result-alg-bdastar')), 30000);
+
+            setTimeout(() => test('opt/none', from, to, document.getElementById('result-opt-none')), 40000);
+            setTimeout(() => test('opt/tnr', from, to, document.getElementById('result-opt-tnr')), 50000);
+            setTimeout(() => test('opt/ch', from, to, document.getElementById('result-opt-ch')), 60000);
+            setTimeout(() => test('opt/chtnr', from, to, document.getElementById('result-opt-chtnr')), 70000);
         });
     </script>
 
