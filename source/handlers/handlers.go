@@ -72,16 +72,16 @@ func HandleOptTnr(ctx Context) {
 	ctx.res.Write(route.ToBytes())
 }
 
-/*func HandleCh(ctx Context) {
+func HandleOptCh(ctx Context) {
 	from, to := parseRouteRequest(ctx)
-	route := ctx.db.Route(ctx.db.Ch(from, to))
+	route := ctx.db.Route(ctx.graphs.Ch.BdDijkstra(from, to))
 
 	ctx.res.Write(route.ToBytes())
 }
 
-func HandleTnrCh(ctx Context) {
+func HandleOptChTnr(ctx Context) {
 	from, to := parseRouteRequest(ctx)
-	route := ctx.db.Route(ctx.db.TnrCh(from, to))
+	route := ctx.db.Route(ctx.graphs.ChTnr.BdDijkstra(from, to))
 
 	ctx.res.Write(route.ToBytes())
-} */
+}

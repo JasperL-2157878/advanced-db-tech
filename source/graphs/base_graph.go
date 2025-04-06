@@ -7,20 +7,20 @@ import (
 )
 
 type BaseGraph struct {
-	super ch.Graph
-	nodes ContractionMap
-	edges ContractionMap
+	super           ch.Graph
+	contractedNodes map[[2]int64][]int64
+	contractedEdges map[[2]int64][]int64
 }
 
 func LoadBaseGraph(db *db.Postgres) *BaseGraph {
 	g := &BaseGraph{}
+	g.contractedNodes = make(map[[2]int64][]int64)
+	g.contractedEdges = make(map[[2]int64][]int64)
 
 	rows, err := db.Query(`SELECT id, source, target, cost, reverse_cost FROM base_graph`)
 	if err != nil {
 		panic(err)
 	}
-
-	defer rows.Close()
 
 	for rows.Next() {
 		var id, source, target int64
@@ -42,9 +42,13 @@ func LoadBaseGraph(db *db.Postgres) *BaseGraph {
 			g.super.AddEdge(target, source, reverseCost)
 		}
 
-		g.nodes.Set(source, target, []int64{source})
-		g.edges.Set(source, target, []int64{id})
+		g.contractedNodes[[2]int64{source, target}] = []int64{source}
+		g.contractedNodes[[2]int64{target, source}] = []int64{source}
+		g.contractedEdges[[2]int64{source, target}] = []int64{id}
+		g.contractedEdges[[2]int64{target, source}] = []int64{id}
 	}
+
+	rows.Close()
 
 	return g
 }
@@ -59,8 +63,8 @@ func (g *BaseGraph) BdDijkstra(source int64, target int64) *types.Path {
 		source := nodes[i-1]
 		target := nodes[i]
 
-		path.Nodes = append(path.Nodes, g.nodes.Get(source, target)...)
-		path.Edges = append(path.Edges, g.edges.Get(source, target)...)
+		path.Nodes = append(path.Nodes, g.contractedNodes[[2]int64{source, target}]...)
+		path.Edges = append(path.Edges, g.contractedEdges[[2]int64{source, target}]...)
 	}
 
 	path.Cost = cost
