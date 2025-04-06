@@ -11,7 +11,7 @@ RUN apt update
 RUN apt upgrade -y
 RUN apt install -y wget
 RUN wget ${PGDUMP_DOWNLOAD} -P /docker-entrypoint-initdb.d
-RUN tar -xzvf /docker-entrypoint-initdb.d/postgres_localhost-2025_04_06_15_26_57-dump.sql.tar.gz -C /docker-entrypoint-initdb.d
+RUN tar -xzvf /docker-entrypoint-initdb.d/postgres_localhost-2025_04_06_16_10_06-dump.sql.tar.gz -C /docker-entrypoint-initdb.d
 
 # Download pgrouting extension
 RUN apt install -y postgresql-common
