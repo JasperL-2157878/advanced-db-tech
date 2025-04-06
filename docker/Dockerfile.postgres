@@ -1,6 +1,6 @@
 FROM postgis/postgis
 
-ARG TELEATLAS_DOWNLOAD
+ARG PGDUMP_DOWNLOAD
 
 # Set locale
 RUN localedef -i nl_BE -c -f ISO-8859-1 -A /usr/share/locale/locale.alias nl_BE.ISO-8859-1
@@ -10,9 +10,8 @@ ENV LANG nl_BE.ISO-8859-1
 RUN apt update
 RUN apt upgrade -y
 RUN apt install -y wget
-RUN mkdir /docker-entrypoint-initdb.d
 RUN wget ${PGDUMP_DOWNLOAD} -P /docker-entrypoint-initdb.d
-RUN tar -xzvf /docker-entrypoint-initdb.d/postgres_localhost-2025_04_06_15_26_57-dump.sql.tar.gz
+RUN tar -xzvf /docker-entrypoint-initdb.d/postgres_localhost-2025_04_06_15_26_57-dump.sql.tar.gz -C /docker-entrypoint-initdb.d
 
 # Download pgrouting extension
 RUN apt install -y postgresql-common

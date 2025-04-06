@@ -1,3 +1,4 @@
+name: advanced-db-tech
 services:
 
   app:
@@ -9,6 +10,10 @@ services:
       dockerfile: docker/Dockerfile.app
     image: "adt:latest"
     container_name: "app"
+    environment:
+     - POSTGRES_USER=${POSTGRES_USER}
+     - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+     - POSTGRES_DB=${POSTGRES_DB}
     command: sh -c "
         ./docker/scripts/app/deploy.sh
       "
@@ -17,14 +22,13 @@ services:
       - "/var/run/docker.sock:/var/run/docker.sock"
     ports:
       - 8080:8080
-    env_file: ../.env
 
   postgres:
     build: 
       context: ..
       dockerfile: docker/Dockerfile.postgres
       args:
-        TELEATLAS_DOWNLOAD: ${TELEATLAS_DOWNLOAD}
+        PGDUMP_DOWNLOAD: ${PGDUMP_DOWNLOAD}
     image: "postgis:custom"
     container_name: postgres
     restart: always
