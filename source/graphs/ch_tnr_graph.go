@@ -2,6 +2,7 @@ package graphs
 
 import (
 	"math"
+	"time"
 
 	db "example.com/source/database"
 	"example.com/source/types"
@@ -158,6 +159,7 @@ func LoadChTnrGraph(db *db.Postgres) *ChTnrGraph {
 }
 
 func (g *ChTnrGraph) BdDijkstra(source int64, target int64) *types.Path {
+	start := time.Now()
 	path := types.Path{}
 
 	_, sourceExists := g.accessNodes[source]
@@ -193,6 +195,8 @@ func (g *ChTnrGraph) BdDijkstra(source int64, target int64) *types.Path {
 	path.Edges = append(path.Edges, g.contractedEdges[[2]int64{sourceAccess, targetAccess}]...)
 	path.Cost += g.transitCosts[[2]int64{sourceAccess, targetAccess}]
 	g.appendPath(&path, targetAccess, target)
+
+	path.QueryTime = time.Since(start)
 
 	return &path
 }

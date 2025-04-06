@@ -2,22 +2,28 @@ package types
 
 import (
 	"encoding/json"
+	"time"
 )
 
 type GeoJSON struct {
-	Type      string       `json:"type"`
-	TotalCost float64      `json:"total_cost"`
-	Features  []GeoFeature `json:"features"`
+	Type         string        `json:"type"`
+	TotalCost    float64       `json:"total_cost"`
+	Features     []GeoFeature  `json:"features"`
+	QueryTime    time.Duration `json:"query_time"`
+	ResponseTime time.Duration `json:"response_time"`
 }
 
-func (g GeoJSON) ToBytes() []byte {
+func (g *GeoJSON) ToBytes() []byte {
 	bytes, _ := json.Marshal(g)
 	return bytes
 }
 
 var EmptyGeoJSON GeoJSON = GeoJSON{
-	Type:     "FeatureCollection",
-	Features: nil,
+	Type:         "FeatureCollection",
+	TotalCost:    -1,
+	Features:     nil,
+	QueryTime:    time.Duration(0),
+	ResponseTime: time.Duration(0),
 }
 
 type GeoFeature struct {

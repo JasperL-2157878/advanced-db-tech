@@ -3,11 +3,13 @@ package db
 import (
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"example.com/source/types"
 )
 
-func (db *Postgres) Route(path *types.Path) types.GeoJSON {
+func (db *Postgres) Route(path *types.Path) *types.GeoJSON {
+	start := time.Now()
 	query := db.QueryRow(fmt.Sprintf(`
 		WITH route AS (
 			SELECT 
@@ -95,7 +97,10 @@ func (db *Postgres) Route(path *types.Path) types.GeoJSON {
 		panic(err)
 	}
 
-	return jsonValue
+	jsonValue.QueryTime = path.QueryTime
+	jsonValue.ResponseTime = time.Since(start)
+
+	return &jsonValue
 }
 
 func (db *Postgres) Dijkstra(from int64, to int64) *types.Path {
@@ -115,6 +120,9 @@ func (db *Postgres) BdAstar(from int64, to int64) *types.Path {
 }
 
 func (db *Postgres) path(alg string, table string, from int64, to int64) *types.Path {
+	var path types.Path
+	start := time.Now()
+
 	rows, err := db.Query(fmt.Sprintf(`
 		SELECT node, edge, agg_cost FROM pgr_%s(
 			'SELECT * FROM %s',
@@ -128,7 +136,6 @@ func (db *Postgres) path(alg string, table string, from int64, to int64) *types.
 		return &types.Path{}
 	}
 
-	var path types.Path
 	for rows.Next() {
 		var node, edge int64
 		var aggCost float64
@@ -142,6 +149,10 @@ func (db *Postgres) path(alg string, table string, from int64, to int64) *types.
 		path.Edges = append(path.Edges, edge)
 		path.Cost = aggCost
 	}
+
+	rows.Close()
+
+	path.QueryTime = time.Since(start)
 
 	return &path
 }

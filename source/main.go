@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"runtime"
 
 	db "example.com/source/database"
 	"example.com/source/graphs"
@@ -17,6 +18,7 @@ func di(f func(ctx handlers.Context)) func(w http.ResponseWriter, r *http.Reques
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("content-type", "application/json")
 		f(handlers.NewContext(r, w, Db, Graphs))
+		runtime.GC() // somewhere memory leak :(
 	}
 }
 

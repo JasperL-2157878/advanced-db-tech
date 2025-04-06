@@ -23,6 +23,6 @@ func NewContext(r *http.Request, w http.ResponseWriter, db *db.Postgres, graphs 
 	}
 }
 
-func (c Context) Param(param string) string {
+func (c *Context) Param(param string) string {
 	return c.req.URL.Query().Get(param)
 }

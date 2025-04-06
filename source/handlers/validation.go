@@ -5,7 +5,7 @@ import (
 	"strconv"
 )
 
-func (c Context) validateRouteParams() bool {
+func (c *Context) validateRouteParams() bool {
 	var valid bool = true
 
 	params := c.req.URL.Query()
@@ -24,7 +24,7 @@ func (c Context) validateRouteParams() bool {
 	return valid
 }
 
-func (c Context) validateGeocodeParams() bool {
+func (c *Context) validateGeocodeParams() bool {
 	params := c.req.URL.Query()
 
 	re := regexp.MustCompile(`^(?P<street_name>[^0-9,]+)\s*(?P<street_number>\d+)?[,\s]*(?P<postal_code>\d{4})?\s*(?P<city_name>\D+)?$`)

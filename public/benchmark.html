@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test</title>
+</head>
+<body>
+
+    <h1>Test</h1>
+
+    <h2>Optimizations</h2>
+    <b>None</b>
+    <p id="result-opt-none"></p>
+    <b>TNR</b>
+    <p id="result-opt-tnr"></p>
+    <b>CH</b>
+    <p id="result-opt-ch"></p>
+    <b>CH+TNR</b>
+    <p id="result-opt-chtnr"></p>
+    
+    <script>
+        async function testOpt(opt, from, to, el) {
+            const r = await fetch(window.location.origin + `/api/v1/route/opt/${opt}?from=${from}&to=${to}`).then(r => r.json());
+
+            queryTime = r.query_time/1_000_000
+            responseTime = r.response_time/1_000_000
+            totalTime = queryTime + responseTime
+
+            el.innerHTML = `total: ${totalTime}<br>query: ${queryTime}<br>response: ${responseTime}`
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const from = 10560298930511;
+            const to = 10560299626068;
+
+            testOpt('none', from, to, document.getElementById('result-opt-none'));
+            testOpt('tnr', from, to, document.getElementById('result-opt-tnr'));
+            testOpt('ch', from, to, document.getElementById('result-opt-ch'));
+            testOpt('chtnr', from, to, document.getElementById('result-opt-chtnr'));
+        });
+    </script>
+
+</body>
+</html>

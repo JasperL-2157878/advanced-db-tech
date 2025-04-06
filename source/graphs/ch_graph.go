@@ -1,6 +1,8 @@
 package graphs
 
 import (
+	"time"
+
 	db "example.com/source/database"
 	"example.com/source/types"
 	"github.com/LdDl/ch"
@@ -103,6 +105,7 @@ func LoadChGraph(db *db.Postgres) *ChGraph {
 }
 
 func (g *ChGraph) BdDijkstra(source int64, target int64) *types.Path {
+	start := time.Now()
 	path := types.Path{}
 
 	cost, nodes := g.super.ShortestPath(source, target)
@@ -117,6 +120,7 @@ func (g *ChGraph) BdDijkstra(source int64, target int64) *types.Path {
 	}
 
 	path.Cost = cost
+	path.QueryTime = time.Since(start)
 
 	return &path
 }
