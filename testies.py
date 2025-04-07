@@ -31,7 +31,7 @@ for alg in algorithms:
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
 
-        n = 1
+        n = 20
         for i in range(n):
             print(f"[{alg}] Iteration {i + 1} of {n}")
             url = get_route_url + alg

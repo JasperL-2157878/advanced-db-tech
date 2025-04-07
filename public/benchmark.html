@@ -4,57 +4,216 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Benchmark</title>
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles/demo.css">
+    <link rel="stylesheet" href="https://fonts.xz.style/serve/inter.css" crossorigin="">
+    <link rel="stylesheet" href="styles/new.min.css">
+
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-
-    <h1>Benchmark</h1>
-
+<header>
+    <h1>Routing Algorithm Benchmark</h1>
+    <nav>
+        <a href="/">Demo</a> /
+        <a href="/benchmark.html">Benchmark</a>
+    </nav>
+</header>
+<main>
+    <p>This page benchmarks the performance of various routing algorithms and optimizations.</p>
     <h2>Algorithms</h2>
-    <b>Dijkstra</b>
-    <p id="result-alg-dijkstra"></p>
-    <b>A*</b>
-    <p id="result-alg-astar"></p>
-    <b>Bidirectional Dijkstra</b>
-    <p id="result-alg-bddijkstra"></p>
-    <b>Bidirectional A*</b>
-    <p id="result-alg-bdastar"></p>
+    <section>
+        <h3>Performance Comparison</h3>
+        <p>This chart compares the performance of Dijkstra, Bi-Dijkstra, A*, and Bi-A* algorithms in terms of
+            runtime.</p>
+    </section>
+    <div class="grid-container">
+        <div class="grid-item-span-1">
+            <b>Dijkstra</b>
+            <p id="result-alg-dijkstra"></p>
+            <b>A*</b>
+            <p id="result-alg-astar"></p>
+            <b>Bidirectional Dijkstra</b>
+            <p id="result-alg-bddijkstra"></p>
+            <b>Bidirectional A*</b>
+            <p id="result-alg-bdastar"></p>
+        </div>
+        <div class="grid-item-span-2">
+            <canvas id="benchmarkAlgoChart" style="width:100% ;margin: 2rem auto;"></canvas>
+        </div>
+    </div>
 
     <h2>Optimizations</h2>
-    <b>None</b>
-    <p id="result-opt-none"></p>
-    <b>TNR</b>
-    <p id="result-opt-tnr"></p>
-    <b>CH</b>
-    <p id="result-opt-ch"></p>
-    <b>CH+TNR</b>
-    <p id="result-opt-chtnr"></p>
-    
-    <script>
-        async function test(route, from, to, el) {
-            const r = await fetch(window.location.origin + `/api/v1/route/${route}?from=${from}&to=${to}`).then(r => r.json());
+    <section>
+        <h3>Performance Comparison</h3>
+        <p>This chart compares the performance of no optimalization, TNR, CH, and CH+TNR in terms of
+            runtime.</p>
+    </section>
+    <div class="grid-container">
+        <div class="grid-item-span-1">
+            <b>None</b>
+            <p id="result-opt-none"></p>
+            <b>TNR</b>
+            <p id="result-opt-tnr"></p>
+            <b>CH</b>
+            <p id="result-opt-ch"></p>
+            <b>CH+TNR</b>
+            <p id="result-opt-chtnr"></p>
+        </div>
+        <div class="grid-item-span-2">
+            <canvas id="benchmarkOptiChart" style="width:100%; height: 100% ;margin: 2rem auto;"></canvas>
+        </div>
+    </div>
 
-            queryTime = r.query_time_ns/1_000_000
-            responseTime = r.response_time_ns/1_000_000
-            totalTime = queryTime + responseTime
+</main>
+<script>
+    const ctx_algo = document.getElementById('benchmarkAlgoChart').getContext('2d');
+    const benchmarkAlgoData = {
+        datasets: [
+            {
+                label: 'Query Time (ms)',
+                backgroundColor: 'rgba(75, 192, 192, 0.9)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                data: [],
+                yAxisID: 'yTime',
+            }
+        ]
+    };
+    const benchmarkAlgoChart = new Chart(ctx_algo, {
+        type: 'bar',
+        data: benchmarkAlgoData,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false, // Add this line!
+            scales: {
+                yTime: {
+                    type: 'linear',
+                    position: 'left',
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Time (ms)',
+                        color: 'rgba(75, 192, 192, 1)'
 
-            el.innerHTML = `total: ${totalTime}ms<br>query: ${queryTime}ms<br>response: ${responseTime}ms`
+                    },
+                    ticks: {
+                        color: 'rgba(75, 192, 192, 1)'
+                    }
+                },
+            },
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                },
+                title: {
+                    display: true,
+                    text: 'Algorithm Benchmark Results'
+                }
+            }
+        }
+    });
+
+    const ctx_opti = document.getElementById('benchmarkOptiChart').getContext('2d');
+    const benchmarkOptiData = {
+        datasets: [
+            {
+                label: 'Query Time (ms)',
+                backgroundColor: 'rgb(192,116,75)',
+                borderColor: 'rgb(192,116,75',
+                data: [],
+                yAxisID: 'yTime',
+            }
+        ]
+    };
+    const benchmarkOptiChart = new Chart(ctx_opti, {
+        type: 'bar',
+        data: benchmarkOptiData,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false, // Add this line!
+            scales: {
+                yTime: {
+                    type: 'linear',
+                    position: 'left',
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Time (ms)',
+                        color: 'rgb(192,116,75)'
+
+                    },
+                    ticks: {
+                        color: 'rgb(192,116,75'
+                    }
+                },
+            },
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                },
+                title: {
+                    display: true,
+                    text: 'Optimizations Benchmark Results'
+                }
+            }
+        }
+    });
+
+    async function test(route, from, to, el) {
+        const r = await fetch(window.location.origin + `/api/v1/route/${route}?from=${from}&to=${to}`).then(r => r.json());
+
+        queryTime = r.query_time_ns / 1_000_000
+        //append queryTime to Timedata
+        addData(route, queryTime);
+
+        responseTime = r.response_time_ns / 1_000_000
+        totalTime = queryTime + responseTime
+
+        el.innerHTML = `total: ${totalTime}ms<br>query: ${queryTime}ms<br>response: ${responseTime}ms`
+    }
+
+    function addData(label, newData) {
+        //if label starts with alg/
+        if (label.startsWith('alg/')) {
+            label = label.replace('alg/', '');
+            benchmarkAlgoChart.data.labels.push(label);
+            benchmarkAlgoChart.data.datasets.forEach((dataset) => {
+                dataset.data.push(newData);
+            });
+            benchmarkAlgoChart.update();
+            benchmarkAlgoChart.resize();
+
+        } else if (label.startsWith('opt/')) {
+            label = label.replace('opt/', '');
+            benchmarkOptiChart.data.labels.push(label);
+            benchmarkOptiChart.data.datasets.forEach((dataset) => {
+                dataset.data.push(newData);
+            });
+            benchmarkOptiChart.update();
+
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const from = 10560298930511;
-            const to = 10560299626068;
+    }
 
-            setTimeout(() => test('alg/dijkstra', from, to, document.getElementById('result-alg-dijkstra')), 0);
-            setTimeout(() => test('alg/astar', from, to, document.getElementById('result-alg-astar')), 10000);
-            setTimeout(() => test('alg/bddijkstra', from, to, document.getElementById('result-alg-bddijkstra')), 20000);
-            setTimeout(() => test('alg/bdastar', from, to, document.getElementById('result-alg-bdastar')), 30000);
+    document.addEventListener('DOMContentLoaded', () => {
+        const from = 10560298930511;
+        const to = 10560299626068;
 
-            setTimeout(() => test('opt/none', from, to, document.getElementById('result-opt-none')), 40000);
-            setTimeout(() => test('opt/tnr', from, to, document.getElementById('result-opt-tnr')), 50000);
-            setTimeout(() => test('opt/ch', from, to, document.getElementById('result-opt-ch')), 60000);
-            setTimeout(() => test('opt/chtnr', from, to, document.getElementById('result-opt-chtnr')), 70000);
-        });
-    </script>
+        setTimeout(() => test('alg/dijkstra', from, to, document.getElementById('result-alg-dijkstra')), 0);
+        setTimeout(() => test('alg/astar', from, to, document.getElementById('result-alg-astar')), 10000);
+        setTimeout(() => test('alg/bddijkstra', from, to, document.getElementById('result-alg-bddijkstra')), 20000);
+        setTimeout(() => test('alg/bdastar', from, to, document.getElementById('result-alg-bdastar')), 30000);
 
+        setTimeout(() => test('opt/none', from, to, document.getElementById('result-opt-none')), 40000);
+        setTimeout(() => test('opt/tnr', from, to, document.getElementById('result-opt-tnr')), 50000);
+        setTimeout(() => test('opt/ch', from, to, document.getElementById('result-opt-ch')), 60000);
+        setTimeout(() => test('opt/chtnr', from, to, document.getElementById('result-opt-chtnr')), 70000);
+    });
+
+
+</script>
 </body>
 </html>
+
+
