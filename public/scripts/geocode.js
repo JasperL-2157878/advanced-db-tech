@@ -94,7 +94,7 @@ routeFrom.addEventListener('submit', async function (e) {
     routeSubmit.innerText = 'Loading';
     routeSubmit.toggleAttribute('disabled');
 
-    geojson = await fetchJSON(window.location.origin + `/api/v1/route/opt/chtnr?from=${from}&to=${to}`, {});
+    geojson = await fetchJSON(window.location.origin + `/api/v1/route/opt/tnr?from=${from}&to=${to}`, {});
 
     routeSubmit.innerText = 'Route';
     routeSubmit.toggleAttribute('disabled');

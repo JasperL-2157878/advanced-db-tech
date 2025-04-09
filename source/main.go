@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 	"runtime"
 
 	db "example.com/source/database"
@@ -24,6 +25,9 @@ func di(f func(ctx handlers.Context)) func(w http.ResponseWriter, r *http.Reques
 
 func main() {
 	defer Db.Close()
+
+	tnr()
+	os.Exit(0)
 
 	http.Handle("/", http.FileServer(http.Dir("public")))
 
