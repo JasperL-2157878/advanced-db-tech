@@ -3,7 +3,9 @@ package main
 import (
 	"encoding/csv"
 	"fmt"
+	"math"
 	"os"
+	"strings"
 	"sync"
 )
 
@@ -26,15 +28,15 @@ var driveways []int64 = getDriveways()
 var exits []int64 = getExits()
 
 func open() {
-	shortcutsFile, _ = os.Create("tnr_shortcuts.csv")
-	shortcuts = csv.NewWriter(shortcutsFile)
-	shortcuts.Comma = ';'
-	shortcuts.Write([]string{"id", "source", "target", "cost", "reverse_cost", "nodes", "edges"})
+	//shortcutsFile, _ = os.Create("tnr_shortcuts.csv")
+	//shortcuts = csv.NewWriter(shortcutsFile)
+	//shortcuts.Comma = ';'
+	//shortcuts.Write([]string{"id", "source", "target", "cost", "reverse_cost", "nodes", "edges"})
 
-	graphFile, _ = os.Create("tnr_graph.csv")
-	graph = csv.NewWriter(graphFile)
-	graph.Comma = ';'
-	graph.Write([]string{"id", "source", "target", "cost", "reverse_cost", "x1", "y1", "x2", "y2"})
+	//graphFile, _ = os.Create("tnr_graph.csv")
+	//graph = csv.NewWriter(graphFile)
+	//graph.Comma = ';'
+	//graph.Write([]string{"id", "source", "target", "cost", "reverse_cost", "x1", "y1", "x2", "y2"})
 
 	accessFile, _ = os.Create("tnr_access.csv")
 	accesses = csv.NewWriter(accessFile)
@@ -43,25 +45,25 @@ func open() {
 }
 
 func close() {
-	for _, edge := range edges {
-		graph.Write([]string{
-			fmt.Sprintf("%d", edge.ID),
-			fmt.Sprintf("%d", edge.Source),
-			fmt.Sprintf("%d", edge.Target),
-			fmt.Sprintf("%f", edge.Cost),
-			fmt.Sprintf("%f", edge.ReverseCost),
-			fmt.Sprintf("%f", edge.X1),
-			fmt.Sprintf("%f", edge.Y1),
-			fmt.Sprintf("%f", edge.X2),
-			fmt.Sprintf("%f", edge.Y2),
-		})
-	}
+	//for _, edge := range edges {
+	//	graph.Write([]string{
+	//		fmt.Sprintf("%d", edge.ID),
+	//		fmt.Sprintf("%d", edge.Source),
+	//		fmt.Sprintf("%d", edge.Target),
+	//		fmt.Sprintf("%f", edge.Cost),
+	//		fmt.Sprintf("%f", edge.ReverseCost),
+	//		fmt.Sprintf("%f", edge.X1),
+	//		fmt.Sprintf("%f", edge.Y1),
+	//		fmt.Sprintf("%f", edge.X2),
+	//		fmt.Sprintf("%f", edge.Y2),
+	//	})
+	//}
 
-	shortcuts.Flush()
-	shortcutsFile.Close()
+	//shortcuts.Flush()
+	//shortcutsFile.Close()
 
-	graph.Flush()
-	graphFile.Close()
+	//graph.Flush()
+	//graphFile.Close()
 
 	accesses.Flush()
 	accessFile.Close()
@@ -71,60 +73,72 @@ func tnr() {
 	open()
 
 	sem := make(chan struct{}, 8)
-	n := len(driveways)
-	m := len(exits)
+	//n := len(driveways)
 
-	id := int64(-1)
+	//id := int64(-1)
 
 	var wg sync.WaitGroup
 	var mu sync.Mutex
-	for i, driveway := range driveways {
-		for j, exit := range exits {
-			fmt.Println(i*n+j, "/", n*m)
+	//for i, driveway := range driveways {
+	//	for j, exit := range exits {
+	//		fmt.Println(i*n+j, "/", 940878)
+	//
+	//		sem <- struct{}{} // acquire slot
+	//		wg.Add(1)
+	//
+	//		go func(id, d, e int64) {
+	//			defer wg.Done()
+	//			defer func() { <-sem }() // release slot
+	//
+	//			if d == e {
+	//				return
+	//			}
+	//
+	//			path := Graphs.ChDijkstra(driveway, exit)
+	//			if path.Cost <= 0 || len(path.Edges) <= 1 {
+	//				return
+	//			}
+	//
+	//			//fmt.Println(driveway, exit, path.Nodes, path.Edges)
+	//
+	//			mu.Lock()
+	//			shortcuts.Write([]string{
+	//				fmt.Sprintf("%d", id),
+	//				fmt.Sprintf("%d", d),
+	//				fmt.Sprintf("%d", e),
+	//				fmt.Sprintf("%f", path.Cost),
+	//				"-1",
+	//				intArrayToString(path.Nodes[1 : len(path.Nodes)-1]),
+	//				intArrayToString(path.Edges),
+	//			})
+	//
+	//			edges[id] = Edge{
+	//				ID:          id,
+	//				Source:      driveway,
+	//				Target:      exit,
+	//				Cost:        path.Cost,
+	//				ReverseCost: -1,
+	//				X1:          edges[path.Edges[0]].X1,
+	//				Y1:          edges[path.Edges[0]].Y1,
+	//				X2:          edges[path.Edges[len(path.Edges)-1]].X2,
+	//				Y2:          edges[path.Edges[len(path.Edges)-1]].Y2,
+	//			}
+	//
+	//			for _, edge := range path.Edges {
+	//				delete(edges, edge)
+	//			}
+	//
+	//			mu.Unlock()
+	//		}(id, driveway, exit)
+	//		id--
+	//	}
+	//}
+	//wg.Wait()
 
-			sem <- struct{}{} // acquire slot
-			wg.Add(1)
-
-			go func(id, d, e int64) {
-				defer wg.Done()
-				defer func() { <-sem }() // release slot
-
-				if d == e {
-					return
-				}
-
-				path := Graphs.ChDijkstra(driveway, exit)
-				if path.Cost <= 0 || len(path.Edges) <= 1 {
-					return
-				}
-
-				path.Nodes = path.Nodes[1 : len(path.Nodes)-1]
-				path.Edges = path.Edges[1 : len(path.Edges)-1]
-
-				mu.Lock()
-				shortcuts.Write([]string{
-					fmt.Sprintf("%d", id),
-					fmt.Sprintf("%d", d),
-					fmt.Sprintf("%d", e),
-					fmt.Sprintf("%f", path.Cost),
-					"-1",
-					intArrayToString(path.Nodes),
-					intArrayToString(path.Edges),
-				})
-
-				for _, edge := range path.Edges {
-					delete(edges, edge)
-				}
-
-				id--
-				mu.Unlock()
-			}(id, driveway, exit)
-		}
-	}
-	wg.Wait()
-
-	/*junctions = getJunctions()
-	for _, junction := range junctions {
+	junctions = getJunctions()
+	n := len(junctions)
+	for i, junction := range junctions {
+		fmt.Println(i, "/", n)
 		sem <- struct{}{} // acquire slot
 		wg.Add(1)
 
@@ -134,40 +148,80 @@ func tnr() {
 
 			var accessSources, accessTargets []AccessNode
 
-			for _, driveway := range driveways {
-				path := Graphs.ChDijkstra(junction, driveway)
-				accessSources = append(accessSources, AccessNode{
-					Junction: driveway,
-					Cost:     path.Cost,
-				})
+			rows, err := Db.Query(`
+				WITH Junction AS (
+					SELECT id, geom FROM jc WHERE id = $1
+				), Driveways AS (
+					SELECT driveway, geom FROM (
+						SELECT DISTINCT source AS driveway FROM tnr_shortcuts
+					) LEFT JOIN jc ON jc.id = driveway
+				)
+				SELECT
+					Driveways.driveway AS access_source_nodes,
+					ST_DISTANCE(Junction.geom, Driveways.geom) AS access_source_costs
+				FROM Junction, Driveways
+				WHERE Junction.id != Driveways.driveway
+				ORDER BY access_source_costs
+				LIMIT 6
+			`, junction)
+			if err != nil {
+				panic(err)
 			}
 
-			for _, exit := range exits {
-				path := Graphs.ChDijkstra(junction, exit)
-				accessSources = append(accessSources, AccessNode{
-					Junction: exit,
-					Cost:     path.Cost,
-				})
+			for rows.Next() {
+				var access AccessNode
+				rows.Scan(&access.Junction, &access.Cost)
+				accessSources = append(accessSources, access)
 			}
 
-			sort.Slice(accessSources, func(i, j int) bool {
-				return accessSources[i].Cost < accessSources[j].Cost
-			})
+			rows.Close()
 
-			sort.Slice(accessTargets, func(i, j int) bool {
-				return accessTargets[i].Cost < accessTargets[j].Cost
-			})
+			rows, err = Db.Query(`
+				WITH Junction AS (
+					SELECT id, geom FROM jc WHERE id = $1
+				), Exits AS (
+					SELECT exit, geom FROM (
+						SELECT DISTINCT target AS exit FROM tnr_shortcuts
+					) LEFT JOIN jc ON jc.id = exit
+				) 
+				SELECT
+					Exits.exit AS access_target_nodes,
+					ST_DISTANCE(Junction.geom, Exits.geom) AS access_target_costs
+				FROM Junction, Exits
+				WHERE Junction.id != Exits.exit
+				ORDER BY access_target_costs
+				LIMIT 6
+			`, junction)
+			if err != nil {
+				panic(err)
+			}
+
+			for rows.Next() {
+				var access AccessNode
+				rows.Scan(&access.Junction, &access.Cost)
+				accessTargets = append(accessTargets, access)
+			}
+
+			rows.Close()
+
+			if len(accessSources) == 0 {
+				accessSources = append(accessSources, AccessNode{Junction: junction, Cost: math.MaxFloat64})
+			}
+
+			if len(accessTargets) == 0 {
+				accessTargets = append(accessTargets, AccessNode{Junction: junction, Cost: math.MaxFloat64})
+			}
 
 			mu.Lock()
-			shortcuts.Write([]string{
+			accesses.Write([]string{
 				fmt.Sprintf("%d", junction),
-				accessArrayToString(accessSources[:6]),
-				accessArrayToString(accessTargets[:6]),
+				accessArrayToString(accessSources),
+				accessArrayToString(accessTargets),
 			})
 			mu.Unlock()
 		}(junction)
 	}
-	wg.Wait()*/
+	wg.Wait()
 
 	close()
 }
@@ -317,14 +371,15 @@ func accessArrayToString(items []AccessNode) string {
 	nodes := "{"
 	costs := "{"
 
-	for i, item := range items {
-		nodes += fmt.Sprintf("%d", item.Junction)
-		costs += fmt.Sprintf("%f", item.Cost)
-		if i < len(items)-1 {
-			nodes += ","
-			costs += ","
-		}
+	for i := 0; i < 6 && i < len(items); i++ {
+		nodes += fmt.Sprintf("%d", items[i].Junction)
+		costs += fmt.Sprintf("%f", items[i].Cost)
+		nodes += ","
+		costs += ","
 	}
+
+	nodes = strings.TrimRight(nodes, ",")
+	costs = strings.TrimRight(costs, ",")
 
 	return nodes + "};" + costs + "}"
 }

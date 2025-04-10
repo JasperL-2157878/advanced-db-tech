@@ -48,7 +48,7 @@ func LoadGraphs(db *db.Postgres) *Graphs {
 		tnrAccessTargetCosts: make(map[int64][]float64),
 	}
 
-	//loadEdges(g, db)
+	loadEdges(g, db)
 	//loadTnrShortcuts(g, db)
 	//loadTnrAccesses(g, db)
 
