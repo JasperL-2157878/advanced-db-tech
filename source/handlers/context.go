@@ -4,22 +4,22 @@ import (
 	"net/http"
 
 	db "example.com/source/database"
-	"example.com/source/graphs"
+	"example.com/source/graph"
 )
 
 type Context struct {
-	req    *http.Request
-	res    http.ResponseWriter
-	db     *db.Postgres
-	graphs *graphs.Graphs
+	req   *http.Request
+	res   http.ResponseWriter
+	db    *db.Postgres
+	graph *graph.Graph
 }
 
-func NewContext(r *http.Request, w http.ResponseWriter, db *db.Postgres, graphs *graphs.Graphs) Context {
+func NewContext(r *http.Request, w http.ResponseWriter, db *db.Postgres, graph *graph.Graph) Context {
 	return Context{
-		req:    r,
-		res:    w,
-		db:     db,
-		graphs: graphs,
+		req:   r,
+		res:   w,
+		db:    db,
+		graph: graph,
 	}
 }
 

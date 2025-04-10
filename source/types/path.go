@@ -10,6 +10,17 @@ type Path struct {
 	Nodes     []int64
 	Edges     []int64
 	QueryTime time.Duration
+	startTime time.Time
+}
+
+func NewPath() Path {
+	return Path{
+		Cost:      0,
+		Nodes:     make([]int64, 0),
+		Edges:     make([]int64, 0),
+		QueryTime: time.Duration(0),
+		startTime: time.Now(),
+	}
 }
 
 func (p *Path) ToTable() string {
@@ -24,4 +35,15 @@ func (p *Path) ToTable() string {
 	}
 
 	return expr + ") AS path(seq,node,edge)"
+}
+
+func (p *Path) Append(q *Path) {
+	p.Cost += q.Cost
+	p.Nodes = append(p.Nodes, q.Nodes...)
+	p.Edges = append(p.Edges, q.Edges...)
+}
+
+func (p *Path) End() {
+	p.QueryTime = time.Since(p.startTime)
+	p.Edges = append(p.Edges, -1)
 }

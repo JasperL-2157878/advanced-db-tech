@@ -60,28 +60,28 @@ func HandleAlgBdAstar(ctx Context) {
 
 func HandleOptNone(ctx Context) {
 	from, to := parseRouteRequest(ctx)
-	route := ctx.db.Route(ctx.graphs.BaseDijkstra(from, to))
+	route := ctx.db.Route(ctx.graph.Base(from, to))
 
 	ctx.res.Write(route.ToBytes())
 }
 
 func HandleOptTnr(ctx Context) {
 	from, to := parseRouteRequest(ctx)
-	route := ctx.db.Route(ctx.graphs.TnrDijkstra(from, to))
+	route := ctx.db.Route(ctx.graph.BaseTnr(from, to))
 
 	ctx.res.Write(route.ToBytes())
 }
 
 func HandleOptCh(ctx Context) {
 	from, to := parseRouteRequest(ctx)
-	route := ctx.db.Route(ctx.graphs.ChDijkstra(from, to))
+	route := ctx.db.Route(ctx.graph.Ch(from, to))
 
 	ctx.res.Write(route.ToBytes())
 }
 
 func HandleOptChTnr(ctx Context) {
 	from, to := parseRouteRequest(ctx)
-	route := ctx.db.Route(ctx.graphs.ChTnrDijkstra(from, to))
+	route := ctx.db.Route(ctx.graph.ChTnr(from, to))
 
 	ctx.res.Write(route.ToBytes())
 }
