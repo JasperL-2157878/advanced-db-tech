@@ -17,7 +17,7 @@ type Graph struct {
 }
 
 func LoadGraph(db *db.Postgres) *Graph {
-	log.Println("[INFO] Loading graph into memory ...")
+	log.Println("[INFO] Loading graph into memory (~7.5GB) ...")
 
 	edges = make(map[[2]int64]int64)
 	tnr = loadTnr(db)
@@ -100,7 +100,7 @@ func LoadGraph(db *db.Postgres) *Graph {
 }
 
 func (g *Graph) Base(source, target int64) *types.Path {
-	path := types.Path{}
+	path := types.NewPath()
 
 	cost, nodes := g.VanillaShortestPath(source, target)
 	n := len(nodes)
@@ -120,7 +120,7 @@ func (g *Graph) Base(source, target int64) *types.Path {
 }
 
 func (g *Graph) Ch(source, target int64) *types.Path {
-	path := types.Path{}
+	path := types.NewPath()
 
 	cost, nodes := g.ShortestPath(source, target)
 	n := len(nodes)
@@ -140,7 +140,7 @@ func (g *Graph) Ch(source, target int64) *types.Path {
 }
 
 func (g *Graph) BaseTnr(source, target int64) *types.Path {
-	path := types.Path{}
+	path := types.NewPath()
 
 	best := math.MaxFloat64
 	tnrFrom := int64(-1)
@@ -176,7 +176,7 @@ func (g *Graph) BaseTnr(source, target int64) *types.Path {
 }
 
 func (g *Graph) ChTnr(source, target int64) *types.Path {
-	path := types.Path{}
+	path := types.NewPath()
 
 	best := math.MaxFloat64
 	tnrFrom := int64(-1)
