@@ -21,7 +21,24 @@
     </nav>
 </header>
 <main>
-    <p>This page benchmarks the performance of various routing algorithms and optimizations.</p>
+    <form id="custom-route-form" action="/api/v1/route" method="get" autocomplete="off">
+        <fieldset>
+            <legend>Navigation</legend>
+
+            <label for="from">From:</label>
+            <input list="from-datalist" id="from" name="from"/>
+            <datalist id="from-datalist"></datalist>
+
+            <label for="to">To:</label>
+            <input list="to-datalist" id="to" name="to"/>
+            <datalist id="to-datalist"></datalist>
+
+            <button id="custom-route-submit">Route</button>
+            <button type="button" id="default-route">TestRoute</button>
+        </fieldset>
+    </form>
+    <p>This page benchmarks the performance of various routing algorithms and optimizations.
+        The default TestRoute is from <b>Erkestraat, Neerpelt</b> to <b>Ieperleestraat, Ieper</b>.</p>
     <h2>Algorithms</h2>
     <section>
         <h3>Performance Comparison</h3>
@@ -160,17 +177,51 @@
         }
     });
 
-    async function test(route, from, to, el) {
-        const r = await fetch(window.location.origin + `/api/v1/route/${route}?from=${from}&to=${to}`).then(r => r.json());
+    const routeForm = document.getElementById('custom-route-form');
+    const defaultRouteButton = document.getElementById('default-route');
+    const fromInput = document.getElementById('from');
+    const fromDatalist = document.getElementById('from-datalist');
+    const toInput = document.getElementById('to');
+    const toDatalist = document.getElementById('to-datalist');
 
-        queryTime = r.query_time_ns / 1_000_000
-        //append queryTime to Timedata
-        addData(route, queryTime);
+    let from = '';
+    let to = '';
+    let fromTimeoutID;
+    let toTimeoutID;
+    let routeTestTimeouts = [];
+    let activeRouteTestId = 0;
 
-        responseTime = r.response_time_ns / 1_000_000
-        totalTime = queryTime + responseTime
 
-        el.innerHTML = `total: ${totalTime}ms<br>query: ${queryTime}ms<br>response: ${responseTime}ms`
+
+    function clearTestData(){
+        clearCharts();
+        clearInnerHTMLS();
+    }
+
+    function clearInnerHTMLS(){
+        document.getElementById('result-alg-dijkstra').innerHTML = '';
+        document.getElementById('result-alg-astar').innerHTML = '';
+        document.getElementById('result-alg-bddijkstra').innerHTML = '';
+        document.getElementById('result-alg-bdastar').innerHTML = '';
+
+        document.getElementById('result-opt-none').innerHTML = '';
+        document.getElementById('result-opt-tnr').innerHTML = '';
+        document.getElementById('result-opt-ch').innerHTML = '';
+        document.getElementById('result-opt-chtnr').innerHTML = '';
+    }
+
+
+    function clearCharts(){
+        benchmarkAlgoChart.data.labels = [];
+        benchmarkAlgoChart.data.datasets.forEach((dataset) => {
+            dataset.data = [];
+        });
+        benchmarkAlgoChart.update();
+        benchmarkOptiChart.data.labels = [];
+        benchmarkOptiChart.data.datasets.forEach((dataset) => {
+            dataset.data = [];
+        });
+        benchmarkOptiChart.update();
     }
 
     function addData(label, newData) {
@@ -195,22 +246,135 @@
         }
 
     }
+    async function test(route, from, to, el, testId) {
+        const r = await fetch(window.location.origin + `/api/v1/route/${route}?from=${from}&to=${to}`).then(r => r.json());
 
-    document.addEventListener('DOMContentLoaded', () => {
-        const from = 10560298930511;
-        const to = 10560299626068;
+        // Check of de test nog actueel is
+        if (testId !== activeRouteTestId) {
+            return;
+        }
 
-        setTimeout(() => test('alg/dijkstra', from, to, document.getElementById('result-alg-dijkstra')), 0);
-        setTimeout(() => test('alg/astar', from, to, document.getElementById('result-alg-astar')), 10000);
-        setTimeout(() => test('alg/bddijkstra', from, to, document.getElementById('result-alg-bddijkstra')), 20000);
-        setTimeout(() => test('alg/bdastar', from, to, document.getElementById('result-alg-bdastar')), 30000);
+        const queryTime = r.query_time_ns / 1_000_000;
+        addData(route, queryTime);
 
-        setTimeout(() => test('opt/none', from, to, document.getElementById('result-opt-none')), 40000);
-        setTimeout(() => test('opt/tnr', from, to, document.getElementById('result-opt-tnr')), 50000);
-        setTimeout(() => test('opt/ch', from, to, document.getElementById('result-opt-ch')), 60000);
-        setTimeout(() => test('opt/chtnr', from, to, document.getElementById('result-opt-chtnr')), 70000);
+        const responseTime = r.response_time_ns / 1_000_000;
+        const totalTime = queryTime + responseTime;
+
+        el.innerHTML = `total: ${totalTime}ms<br>query: ${queryTime}ms<br>response: ${responseTime}ms`;
+    }
+
+
+
+    function routeTest(from, to) {
+        // Verhoog de test ID
+        activeRouteTestId++;
+        const currentTestId = activeRouteTestId;
+
+        // Stop vorige timeouts
+        routeTestTimeouts.forEach(timeout => clearTimeout(timeout));
+        routeTestTimeouts = [];
+
+        clearTestData();
+
+        routeTestTimeouts.push(setTimeout(() => test('alg/dijkstra', from, to, document.getElementById('result-alg-dijkstra'), currentTestId), 0));
+        routeTestTimeouts.push(setTimeout(() => test('alg/astar', from, to, document.getElementById('result-alg-astar'), currentTestId), 10000));
+        routeTestTimeouts.push(setTimeout(() => test('alg/bddijkstra', from, to, document.getElementById('result-alg-bddijkstra'), currentTestId), 20000));
+        routeTestTimeouts.push(setTimeout(() => test('alg/bdastar', from, to, document.getElementById('result-alg-bdastar'), currentTestId), 30000));
+
+        routeTestTimeouts.push(setTimeout(() => test('opt/none', from, to, document.getElementById('result-opt-none'), currentTestId), 40000));
+        routeTestTimeouts.push(setTimeout(() => test('opt/tnr', from, to, document.getElementById('result-opt-tnr'), currentTestId), 50000));
+        routeTestTimeouts.push(setTimeout(() => test('opt/ch', from, to, document.getElementById('result-opt-ch'), currentTestId), 60000));
+        routeTestTimeouts.push(setTimeout(() => test('opt/chtnr', from, to, document.getElementById('result-opt-chtnr'), currentTestId), 70000));
+    }
+
+
+
+
+    async function fetchJSON(url, def) {
+        response = await fetch(url);
+        if (!response.ok) {
+            return def;
+        }
+
+        return await response.json();
+    }
+
+    function addAddressOption(datalist, value, text) {
+        const option = document.createElement('option');
+        option.value = value;
+        option.innerText = text;
+        datalist.appendChild(option);
+    }
+
+    async function addAddressSuggestions(input, datalist) {
+        suggestions = await fetchJSON(window.location.origin + `/api/v1/geocode?address=${input.value}`, []);
+        datalist.innerHTML = ''
+
+        suggestions.forEach(s => {
+            min = Math.min(s.l_f_add, s.l_t_add, s.r_f_add, s.r_t_add);
+            max = Math.max(s.l_f_add, s.l_t_add, s.r_f_add, s.r_t_add);
+
+            address = /^(?<street>[^0-9,]+)\s*(?<number>\d+)?[,\s]*(?<postal>\d{4})?\s*(?<city>\D+)?$/.exec(input.value);
+            if (!address) {
+                return;
+            }
+
+            street = address.groups.street.trim();
+            number = address.groups.number?.trim();
+            postal = address.groups.postal?.trim();
+            city = address.groups.city?.trim();
+
+            if (number == undefined) {
+                addAddressOption(datalist, `${s.fullname}, ${s.l_pc} ${s.l_axon}`, s.f_jnctid);
+            } else {
+                for (i = min; i <= max; i++) {
+                    if (`${i}`.startsWith(`${number}`)) {
+                        addAddressOption(datalist, `${s.fullname} ${i}, ${s.l_pc} ${s.l_axon}`, s.f_jnctid);
+                    }
+                }
+            }
+        });
+
+        if (suggestions.length == 0 && input.value.length != 0) {
+            addAddressOption(datalist, `${input.value} − No results found`, '');
+        }
+    }
+
+    fromInput.addEventListener('input', function() {
+        clearTimeout(fromTimeoutID);
+        fromTimeoutID = setTimeout(addAddressSuggestions, 500, fromInput, fromDatalist);
     });
 
+    toInput.addEventListener('input', function() {
+        clearTimeout(toTimeoutID);
+        toTimeoutID = setTimeout(addAddressSuggestions, 500, toInput, toDatalist);
+    });
+
+    defaultRouteButton.addEventListener('click', function (e) {
+        e.preventDefault();
+        routeTest(10560298930511, 10560299626068);
+    });
+
+    routeForm.addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        let params = new URLSearchParams(window.location.search);
+
+        Array.from(fromDatalist.children).forEach(option => {
+            if (option.value == fromInput.value) {
+                from = option.innerText;
+            }
+        });
+
+        Array.from(toDatalist.children).forEach(option => {
+            if (option.value == toInput.value) {
+                to = option.innerText;
+            }
+        });
+
+        routeTest(from, to);
+
+    });
 
 </script>
 </body>

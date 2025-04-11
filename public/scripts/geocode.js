@@ -1,4 +1,4 @@
-const routeFrom = document.getElementById('route-form');
+const routeForm = document.getElementById('route-form');
 const routeSubmit = document.getElementById('route-submit');
 const fromInput = document.getElementById('from');
 const fromDatalist = document.getElementById('from-datalist');
@@ -70,7 +70,7 @@ toInput.addEventListener('input', function() {
     toTimeoutID = setTimeout(addAddressSuggestions, 500, toInput, toDatalist);
 });
 
-routeFrom.addEventListener('submit', async function (e) {
+routeForm.addEventListener('submit', async function (e) {
     e.preventDefault();
 
     let params = new URLSearchParams(window.location.search);
