@@ -6,18 +6,18 @@ import (
 	"runtime"
 
 	db "example.com/source/database"
-	"example.com/source/graphs"
+	"example.com/source/graph"
 	"example.com/source/handlers"
 )
 
 var Db *db.Postgres = db.NewPostgres()
-var Graphs *graphs.Graphs = graphs.LoadGraphs(Db)
+var Graph *graph.Graph = graph.LoadGraph(Db)
 
 // Injects dependencies into Context-handlers and translates them to HandleFunc-handlers
 func di(f func(ctx handlers.Context)) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("content-type", "application/json")
-		f(handlers.NewContext(r, w, Db, Graphs))
+		f(handlers.NewContext(r, w, Db, Graph))
 		runtime.GC() // somewhere memory leak :(
 	}
 }
