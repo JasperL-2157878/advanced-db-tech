@@ -14,10 +14,8 @@ func (db *Postgres) Route(path *types.Path) *types.GeoJSON {
 		WITH route AS (
 			SELECT 
 				path.seq,
-				nw.gid,
 				nw.name,
 				nw.meters,
-				nw.routenum,
 				nl.minutes,
 				nl.fow,
 				CASE
@@ -71,9 +69,7 @@ func (db *Postgres) Route(path *types.Path) *types.GeoJSON {
 					'type', 'Feature',
 					'geometry', ST_AsGeoJSON(geom)::json,
 					'properties', json_build_object(
-						'gid', gid,
 						'street_name', name,
-						'route_num', routenum,
 						'fow', fow,
 						'angle_diff', angle_diff,
 						'distance', meters,

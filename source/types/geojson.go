@@ -38,9 +38,7 @@ type GeoGeometry struct {
 }
 
 type GeoProperties struct {
-	Gid        int     `json:"gid"`
 	StreetName string  `json:"street_name"`
-	RouteNum   string  `json:"route_num"`
 	Fow        int8    `json:"fow"`
 	AngleDiff  float64 `json:"angle_diff"`
 	Distance   float64 `json:"distance"`
