@@ -5,6 +5,8 @@ import (
 	"github.com/lib/pq"
 )
 
+const TNR_THRESHOLD float64 = 25.0
+
 type Tnr struct {
 	Shortcuts map[[2]int64]TnrShortcut
 	Sources   map[int64][]TnrAccess

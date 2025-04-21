@@ -10,6 +10,7 @@ import (
 )
 
 var edges map[[2]int64]int64
+var coords map[int64][2]float64
 var tnr *Tnr
 
 type Graph struct {
@@ -20,6 +21,7 @@ func LoadGraph(db *db.Postgres) *Graph {
 	log.Println("[INFO] Loading graph into memory (~7.5GB) ...")
 
 	edges = make(map[[2]int64]int64)
+	coords = make(map[int64][2]float64)
 	tnr = loadTnr(db)
 
 	g := Graph{}
@@ -96,6 +98,23 @@ func LoadGraph(db *db.Postgres) *Graph {
 		g.AddShortcut(source, target, via, cost)
 	}
 
+	rows, err = db.Query(`SELECT id, ST_X(ST_GeometryN(geom, 1)) AS x, ST_Y(ST_GeometryN(geom, 1)) AS y FROM jc`)
+	if err != nil {
+		panic(err)
+	}
+
+	for rows.Next() {
+		var junction int64
+		var x, y float64
+
+		err := rows.Scan(&junction, &x, &y)
+		if err != nil {
+			panic(err)
+		}
+
+		coords[junction] = [2]float64{x, y}
+	}
+
 	return &g
 }
 
@@ -142,6 +161,10 @@ func (g *Graph) Ch(source, target int64) *types.Path {
 func (g *Graph) BaseTnr(source, target int64) *types.Path {
 	path := types.NewPath()
 
+	if haversine(source, target) < TNR_THRESHOLD {
+		return g.Base(source, target)
+	}
+
 	best := math.MaxFloat64
 	tnrFrom := int64(-1)
 	tnrTo := int64(-1)
@@ -185,6 +208,10 @@ func (g *Graph) BaseTnr(source, target int64) *types.Path {
 func (g *Graph) ChTnr(source, target int64) *types.Path {
 	path := types.NewPath()
 
+	if haversine(source, target) < TNR_THRESHOLD {
+		return g.Ch(source, target)
+	}
+
 	best := math.MaxFloat64
 	tnrFrom := int64(-1)
 	tnrTo := int64(-1)
@@ -223,4 +250,24 @@ func (g *Graph) ChTnr(source, target int64) *types.Path {
 	path.End()
 
 	return &path
+}
+
+func haversine(source, target int64) float64 {
+	const R = 6371
+
+	latSourceRad := coords[source][0] * math.Pi / 180
+	lonSourceRad := coords[source][1] * math.Pi / 180
+	latTargetRad := coords[target][0] * math.Pi / 180
+	lonTargetRad := coords[target][1] * math.Pi / 180
+
+	dlat := latTargetRad - latSourceRad
+	dlon := lonTargetRad - lonSourceRad
+
+	a := math.Sin(dlat/2)*math.Sin(dlat/2) +
+		math.Cos(latSourceRad)*math.Cos(latTargetRad)*
+			math.Sin(dlon/2)*math.Sin(dlon/2)
+
+	c := 2 * math.Atan2(math.Sqrt(a), math.Sqrt(1-a))
+
+	return R * c
 }
