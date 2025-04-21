@@ -33,7 +33,7 @@ async function addAddressSuggestions(input, datalist) {
     suggestions.forEach(s => {
         min = Math.min(s.l_f_add, s.l_t_add, s.r_f_add, s.r_t_add);
         max = Math.max(s.l_f_add, s.l_t_add, s.r_f_add, s.r_t_add);
-        
+
         address = /^(?<street>[^0-9,]+)\s*(?<number>\d+)?[,\s]*(?<postal>\d{4})?\s*(?<city>\D+)?$/.exec(input.value);
         if (!address) {
             return;
@@ -60,12 +60,12 @@ async function addAddressSuggestions(input, datalist) {
     }
 }
 
-fromInput.addEventListener('input', function() {
+fromInput.addEventListener('input', function () {
     clearTimeout(fromTimeoutID);
     fromTimeoutID = setTimeout(addAddressSuggestions, 500, fromInput, fromDatalist);
 });
 
-toInput.addEventListener('input', function() {
+toInput.addEventListener('input', function () {
     clearTimeout(toTimeoutID);
     toTimeoutID = setTimeout(addAddressSuggestions, 500, toInput, toDatalist);
 });
@@ -88,7 +88,7 @@ routeForm.addEventListener('submit', async function (e) {
             params.set("to", to)
         }
     });
-    
+
     window.history.pushState('', '', window.location.origin + '?' + params.toString())
 
     routeSubmit.innerText = 'Loading';

@@ -151,9 +151,12 @@ func (g *Graph) BaseTnr(source, target int64) *types.Path {
 
 	for i := 0; i < n; i++ {
 		for j := 0; j < m; j++ {
-			dist := tnr.Sources[source][i].Cost +
-				tnr.Shortcuts[[2]int64{tnr.Sources[source][i].Node, tnr.Targets[target][j].Node}].Cost +
-				tnr.Targets[target][j].Cost
+			shortcut, exists := tnr.Shortcuts[[2]int64{tnr.Sources[source][i].Node, tnr.Targets[target][j].Node}]
+			if !exists {
+				continue
+			}
+
+			dist := tnr.Sources[source][i].Cost + shortcut.Cost + tnr.Targets[target][j].Cost
 
 			if dist < best {
 				best = dist
@@ -161,6 +164,10 @@ func (g *Graph) BaseTnr(source, target int64) *types.Path {
 				tnrTo = tnr.Targets[target][j].Node
 			}
 		}
+	}
+
+	if tnrTo < 0 || tnrFrom < 0 {
+		return g.Base(source, target)
 	}
 
 	path.Append(g.Base(source, tnrFrom))
