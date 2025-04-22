@@ -23,6 +23,10 @@ func NewPath() Path {
 	}
 }
 
+func (p *Path) IsEmpty() bool {
+	return len(p.Nodes) == 0
+}
+
 func (p *Path) ToTable() string {
 	expr := "(VALUES "
 	n := len(p.Nodes)

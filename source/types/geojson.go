@@ -13,6 +13,14 @@ type GeoJSON struct {
 	ResponseTime time.Duration `json:"response_time_ns"`
 }
 
+func (g *GeoJSON) IsEmpty() bool {
+	return g.Type == EmptyGeoJSON.Type &&
+		g.TotalCost == EmptyGeoJSON.TotalCost &&
+		g.Features == nil &&
+		g.QueryTime == EmptyGeoJSON.QueryTime &&
+		g.ResponseTime == EmptyGeoJSON.ResponseTime
+}
+
 func (g *GeoJSON) ToBytes() []byte {
 	bytes, _ := json.Marshal(g)
 	return bytes

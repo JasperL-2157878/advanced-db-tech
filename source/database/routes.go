@@ -10,6 +10,11 @@ import (
 
 func (db *Postgres) Route(path *types.Path) *types.GeoJSON {
 	start := time.Now()
+
+	if path.IsEmpty() {
+		return &types.EmptyGeoJSON
+	}
+
 	query := db.QueryRow(fmt.Sprintf(`
 		WITH route AS (
 			SELECT 
