@@ -265,7 +265,7 @@
 
 
 
-    function routeTest(from, to) {
+    async function routeTest(from, to) {
         // Verhoog de test ID
         activeRouteTestId++;
         const currentTestId = activeRouteTestId;
@@ -276,16 +276,18 @@
 
         clearTestData();
 
-        routeTestTimeouts.push(setTimeout(() => test('alg/dijkstra', from, to, document.getElementById('result-alg-dijkstra'), currentTestId), 0));
-        routeTestTimeouts.push(setTimeout(() => test('alg/astar', from, to, document.getElementById('result-alg-astar'), currentTestId), 10000));
-        routeTestTimeouts.push(setTimeout(() => test('alg/bddijkstra', from, to, document.getElementById('result-alg-bddijkstra'), currentTestId), 20000));
-        routeTestTimeouts.push(setTimeout(() => test('alg/bdastar', from, to, document.getElementById('result-alg-bdastar'), currentTestId), 30000));
+        // Serial execution
+        await test('alg/dijkstra', from, to, document.getElementById('result-alg-dijkstra'), currentTestId);
+        await test('alg/astar', from, to, document.getElementById('result-alg-astar'), currentTestId);
+        await test('alg/bddijkstra', from, to, document.getElementById('result-alg-bddijkstra'), currentTestId);
+        await test('alg/bdastar', from, to, document.getElementById('result-alg-bdastar'), currentTestId);
 
-        routeTestTimeouts.push(setTimeout(() => test('opt/none', from, to, document.getElementById('result-opt-none'), currentTestId), 40000));
-        routeTestTimeouts.push(setTimeout(() => test('opt/tnr', from, to, document.getElementById('result-opt-tnr'), currentTestId), 50000));
-        routeTestTimeouts.push(setTimeout(() => test('opt/ch', from, to, document.getElementById('result-opt-ch'), currentTestId), 60000));
-        routeTestTimeouts.push(setTimeout(() => test('opt/chtnr', from, to, document.getElementById('result-opt-chtnr'), currentTestId), 70000));
+        await test('opt/none', from, to, document.getElementById('result-opt-none'), currentTestId);
+        await test('opt/tnr', from, to, document.getElementById('result-opt-tnr'), currentTestId);
+        await test('opt/ch', from, to, document.getElementById('result-opt-ch'), currentTestId);
+        await test('opt/chtnr', from, to, document.getElementById('result-opt-chtnr'), currentTestId);
     }
+
 
 
 
