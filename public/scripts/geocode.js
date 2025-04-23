@@ -4,6 +4,7 @@ const fromInput = document.getElementById('from');
 const fromDatalist = document.getElementById('from-datalist');
 const toInput = document.getElementById('to');
 const toDatalist = document.getElementById('to-datalist');
+const algorithmSelect = document.getElementById('algorithm-select');
 
 let from = '';
 let to = '';
@@ -89,15 +90,17 @@ routeForm.addEventListener('submit', async function (e) {
         }
     });
 
+    params.set("algorithm", algorithmSelect.value);
+
     window.history.pushState('', '', window.location.origin + '?' + params.toString())
 
     routeSubmit.innerText = 'Loading';
     routeSubmit.toggleAttribute('disabled');
 
-    geojson = await fetchJSON(window.location.origin + `/api/v1/route/opt/chtnr?from=${from}&to=${to}`, {});
+    geojson = await fetchJSON(window.location.origin + `/api/v1/route/${params.get("algorithm")}?from=${from}&to=${to}`, {});
 
     routeSubmit.innerText = 'Route';
     routeSubmit.toggleAttribute('disabled');
 
-    loadJSON(map, geojson);
+    loadJSON(map, geojson, from, to, params.get("algorithm"));
 });

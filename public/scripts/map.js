@@ -1,7 +1,8 @@
-let loadedJSONLayer = null;
+let loadedJSONLayers = [];
 let currentLocationLayer = null;
 let markers = []
 let locationSet = false;
+let currentRoutePoints = null;
 
 function addOpenStreetMaps(map) {
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom: 19}).addTo(map);
@@ -20,7 +21,7 @@ function onLocationFound(map, e) {
 
     currentLocationLayer = L.circle(e.latlng, e.accuracy).addTo(map);
 
-    if (loadedJSONLayer === null && !locationSet) {
+    if (loadedJSONLayers.length === 0 && !locationSet) {
         map.setView(e.latlng, 15);
         locationSet = true;
     }
@@ -50,8 +51,8 @@ function removeLayers(map) {
         map.removeLayer(currentLocationLayer);
     }
 
-    if (loadedJSONLayer) {
-        map.removeLayer(loadedJSONLayer);
+    for (let i = 0; i < loadedJSONLayers.length; i++) {
+        map.removeLayer(loadedJSONLayers[i]);
     }
 
     markers.forEach(marker => {
@@ -73,18 +74,43 @@ function addMarkers(map, json) {
     }
 }
 
-function loadJSON(map, json) {
-    removeLayers(map)
+function getAlgorithmColor(value) {
+    const colorMap = new Map([
+        ["alg/dijkstra", "#1f77b4"],
+        ["alg/astar", "#ff7f0e"],
+        ["alg/bddijkstra", "#2ca02c"],
+        ["alg/bdastar", "#d62728"],
+        ["opt/none", "#9467bd"],
+        ["opt/tnr", "#8c564b"],
+        ["opt/ch", "#e377c2"],
+        ["opt/chtnr", "#7f7f7f"]
+    ]);
+
+    return colorMap.get(value) || "#000000";
+}
+
+function loadJSON(map, json, from, to, algorithm) {
+    const newRoutePoints = from + "_" + to
+
+    if (currentRoutePoints !== newRoutePoints) {
+        removeLayers(map)
+        addMarkers(map, json)
+        currentRoutePoints = newRoutePoints
+    }
 
     generateTurnByTurn(json)
-    addMarkers(map, json)
 
-    loadedJSONLayer = L.geoJSON(json, {
-        onEachFeature: onEachFeature
+    const loadedJSONLayer = L.geoJSON(json, {
+        onEachFeature: onEachFeature,
+        style: {
+            "color": getAlgorithmColor(algorithm),
+        }
     });
     loadedJSONLayer.addTo(map)
 
     zoomToData(map, loadedJSONLayer);
+
+    loadedJSONLayers.push(loadedJSONLayer)
 }
 
 function zoomToData(map, data) {

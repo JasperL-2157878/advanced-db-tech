@@ -22,7 +22,7 @@
 
     <main>
 
-        <form id="route-form" action="/api/v1/route" method="get" autocomplete="off">
+        <form id="route-form" method="get" autocomplete="off">
             <fieldset>
                 <legend>Navigation</legend>
     
@@ -34,11 +34,55 @@
                 <input list="to-datalist" id="to" name="to"/>
                 <datalist id="to-datalist"></datalist>
 
+                <br/>
+
+                <label for="algorithm-select">Algorithm:</label>
+                <select id="algorithm-select" name="algorithm-select">
+                    <option value="alg/dijkstra">Dijkstra</option>
+                    <option value="alg/astar">A*</option>
+                    <option value="alg/bddijkstra">Bidirectional Dijkstra</option>
+                    <option value="alg/bdastar">Bidirectional A*</option>
+                    <option value="opt/none">Go Dijkstra</option>
+                    <option value="opt/tnr">Go TNR Dijkstra</option>
+                    <option value="opt/ch">Go CH Dijkstra</option>
+                    <option value="opt/chtnr">Go CH TNR Dijkstra</option>
+                </select>
+
                 <button id="route-submit">Route</button>
             </fieldset>
         </form>
 
         <div id="map" style="height: 500px; border-radius: 4px; margin-bottom: 1rem;"></div>
+        <div id="legend" style="margin-top: 20px; font-family: sans-serif;">
+            <h4 style="margin-bottom: 8px;">Algorithm Legend</h4>
+            <div style="display: flex; flex-wrap: wrap; gap: 16px;">
+                <div style="display: flex; align-items: center;">
+                    <span style="background:#1f77b4; width:15px; height:15px; display:inline-block; margin-right:6px;"></span>Dijkstra
+                </div>
+                <div style="display: flex; align-items: center;">
+                    <span style="background:#ff7f0e; width:15px; height:15px; display:inline-block; margin-right:6px;"></span>A*
+                </div>
+                <div style="display: flex; align-items: center;">
+                    <span style="background:#2ca02c; width:15px; height:15px; display:inline-block; margin-right:6px;"></span>Bidirectional Dijkstra
+                </div>
+                <div style="display: flex; align-items: center;">
+                    <span style="background:#d62728; width:15px; height:15px; display:inline-block; margin-right:6px;"></span>Bidirectional A*
+                </div>
+                <div style="display: flex; align-items: center;">
+                    <span style="background:#9467bd; width:15px; height:15px; display:inline-block; margin-right:6px;"></span>Go Dijkstra
+                </div>
+                <div style="display: flex; align-items: center;">
+                    <span style="background:#8c564b; width:15px; height:15px; display:inline-block; margin-right:6px;"></span>Go TNR Dijkstra
+                </div>
+                <div style="display: flex; align-items: center;">
+                    <span style="background:#e377c2; width:15px; height:15px; display:inline-block; margin-right:6px;"></span>Go CH Dijkstra
+                </div>
+                <div style="display: flex; align-items: center;">
+                    <span style="background:#7f7f7f; width:15px; height:15px; display:inline-block; margin-right:6px;"></span>Go CH TNR Dijkstra
+                </div>
+            </div>
+        </div>
+
 
         <div>
             <div class="route-header">
