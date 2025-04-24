@@ -38,7 +38,9 @@
         </fieldset>
     </form>
     <p>This page benchmarks the performance of various routing algorithms and optimizations.
-        The default TestRoute is from <b>Erkestraat, Neerpelt</b> to <b>Ieperleestraat, Ieper</b>.</p>
+        The default TestRoute is from <b>Erkestraat, Neerpelt</b> to <b>Ieperleestraat, Ieper</b>.<br>
+        <a href="/results.html">Here</a> you can find a link to a page with the average performance of the
+        algorithms and optimizations based on 100 measurements for this route.</p>
     <h2>Algorithms</h2>
     <section>
         <h3>Performance Comparison</h3>
@@ -192,13 +194,12 @@
     let activeRouteTestId = 0;
 
 
-
-    function clearTestData(){
+    function clearTestData() {
         clearCharts();
         clearInnerHTMLS();
     }
 
-    function clearInnerHTMLS(){
+    function clearInnerHTMLS() {
         document.getElementById('result-alg-dijkstra').innerHTML = '';
         document.getElementById('result-alg-astar').innerHTML = '';
         document.getElementById('result-alg-bddijkstra').innerHTML = '';
@@ -211,7 +212,7 @@
     }
 
 
-    function clearCharts(){
+    function clearCharts() {
         benchmarkAlgoChart.data.labels = [];
         benchmarkAlgoChart.data.datasets.forEach((dataset) => {
             dataset.data = [];
@@ -246,6 +247,7 @@
         }
 
     }
+
     async function test(route, from, to, el, testId) {
         const r = await fetch(window.location.origin + `/api/v1/route/${route}?from=${from}&to=${to}`).then(r => r.json());
 
@@ -262,7 +264,6 @@
 
         el.innerHTML = `total: ${totalTime}ms<br>query: ${queryTime}ms<br>response: ${responseTime}ms`;
     }
-
 
 
     async function routeTest(from, to) {
@@ -287,9 +288,6 @@
         await test('opt/ch', from, to, document.getElementById('result-opt-ch'), currentTestId);
         await test('opt/chtnr', from, to, document.getElementById('result-opt-chtnr'), currentTestId);
     }
-
-
-
 
 
     async function fetchJSON(url, def) {
@@ -342,12 +340,12 @@
         }
     }
 
-    fromInput.addEventListener('input', function() {
+    fromInput.addEventListener('input', function () {
         clearTimeout(fromTimeoutID);
         fromTimeoutID = setTimeout(addAddressSuggestions, 500, fromInput, fromDatalist);
     });
 
-    toInput.addEventListener('input', function() {
+    toInput.addEventListener('input', function () {
         clearTimeout(toTimeoutID);
         toTimeoutID = setTimeout(addAddressSuggestions, 500, toInput, toDatalist);
     });

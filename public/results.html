@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Benchmark</title>
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles/demo.css">
+    <link rel="stylesheet" href="https://fonts.xz.style/serve/inter.css" crossorigin="">
+    <link rel="stylesheet" href="styles/new.min.css">
+
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<header>
+    <h1>Testroute data</h1>
+    <nav>
+        <a href="/">Demo</a> /
+        <a href="/benchmark.html">Benchmark</a>
+    </nav>
+</header>
+<main>
+    <p>This page shows the average performance of various routing algorithms and optimizations from <b>Erkestraat,
+        Neerpelt</b>
+        to <b>Ieperleestraat, Ieper</b>, based on 100 measurements.</p>
+
+
+    <canvas id="averageChart_per_algo" style="width:200%;margin: 2rem auto; translate: -25% 0;"></canvas>
+    <canvas id="averageChart_per_timing" style="width:200% ;margin: 2rem auto; translate: -25% 0;"></canvas>
+
+
+</main>
+<script>
+    const ctx_algo = document.getElementById('averageChart_per_algo').getContext('2d');
+    const data = {
+        "alg/dijkstra": {
+            "query_time_ms": 2411.51312142,
+            "response_time_ms": 66.24255953000002,
+            "total_time_ms": 2477.75568095
+        },
+        "alg/astar": {
+            "query_time_ms": 2640.3013366500004,
+            "response_time_ms": 66.41021547999999,
+            "total_time_ms": 2706.7115521300007
+        },
+        "alg/bddijkstra": {
+            "query_time_ms": 2405.32815837,
+            "response_time_ms": 62.87079113000001,
+            "total_time_ms": 2468.1989495
+        },
+        "alg/bdastar": {
+            "query_time_ms": 2582.43463347,
+            "response_time_ms": 63.744796019999995,
+            "total_time_ms": 2646.1794294900005
+        },
+        "opt/none": {
+            "query_time_ms": 671.2273858199999,
+            "response_time_ms": 64.15307688,
+            "total_time_ms": 735.3804627
+        },
+        "opt/tnr": {
+            "query_time_ms": 100.03734254999998,
+            "response_time_ms": 62.3103737,
+            "total_time_ms": 162.34771625
+        },
+        "opt/ch": {
+            "query_time_ms": 7.06991351,
+            "response_time_ms": 73.23800506,
+            "total_time_ms": 80.30791857
+        },
+        "opt/chtnr": {
+            "query_time_ms": 3.5465412599999997,
+            "response_time_ms": 70.49862379999999,
+            "total_time_ms": 74.04516506
+        }
+    }
+    const labels = Object.keys(data);
+    const queryTimes = labels.map(label => data[label].query_time_ms);
+    const responseTimes = labels.map(label => data[label].response_time_ms);
+    const totalTimes = labels.map(label => data[label].total_time_ms);
+
+    const chartData = {
+        labels: labels,
+        datasets: [
+            {
+                label: 'Query Time (ms)',
+                data: queryTimes,
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 1
+            },
+            {
+                label: 'Response Time (ms)',
+                data: responseTimes,
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            },
+            {
+                label: 'Total Time (ms)',
+                data: totalTimes,
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
+            }
+        ]
+    };
+    const config = {
+        type: 'bar',
+        data: chartData,
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    };
+    const averageChart = new Chart(ctx_algo, config);
+
+
+    const averageChart_per_timing = document.getElementById('averageChart_per_timing').getContext('2d');
+
+    // Nieuwe labels voor op de x-as
+    const labels_2 = ['Query Time (ms)', 'Response Time (ms)', 'Total Time (ms)'];
+
+    // Maak een dataset per algoritme
+    const datasets = Object.keys(data).map(algo => {
+        return {
+            label: algo,
+            data: [
+                data[algo].query_time_ms,
+                data[algo].response_time_ms,
+                data[algo].total_time_ms
+            ],
+            borderWidth: 1
+        };
+    });
+
+
+    const chartData_2 = {
+        labels: labels_2,
+        datasets: datasets
+    };
+
+    const config_2 = {
+        type: 'bar',
+        data: chartData_2,
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    };
+
+    const averageChart_2 = new Chart(averageChart_per_timing, config_2);
+
+
+</script>
+</body>
+</html>
+
+
