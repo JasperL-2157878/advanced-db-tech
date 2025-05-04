@@ -27,6 +27,7 @@ func main() {
 
 	http.Handle("/", http.FileServer(http.Dir("public")))
 
+	http.HandleFunc("/api/v1/places", di(handlers.HandlePlaces))
 	http.HandleFunc("/api/v1/geocode", di(handlers.HandleGeocode))
 	http.HandleFunc("/api/v1/route", di(handlers.HandleAlgDijkstra))
 

@@ -27,36 +27,73 @@ function addAddressOption(datalist, value, text) {
     datalist.appendChild(option);
 }
 
-async function addAddressSuggestions(input, datalist) {
-    suggestions = await fetchJSON(window.location.origin + `/api/v1/geocode?address=${input.value}`, []);
-    datalist.innerHTML = ''
+async function getGeocodeResults(input) {
+    const geocodes = await fetchJSON(window.location.origin + `/api/v1/geocode?address=${input.value}`, []);
+    const geocodeResults = new Map()
 
-    suggestions.forEach(s => {
-        min = Math.min(s.l_f_add, s.l_t_add, s.r_f_add, s.r_t_add);
-        max = Math.max(s.l_f_add, s.l_t_add, s.r_f_add, s.r_t_add);
-
-        address = /^(?<street>[^0-9,]+)\s*(?<number>\d+)?[,\s]*(?<postal>\d{4})?\s*(?<city>\D+)?$/.exec(input.value);
+    geocodes.forEach(s => {
+        const address = /^(?<street>[^0-9,]+)\s*(?<number>\d+)?[,\s]*(?<postal>\d{4})?\s*(?<city>\D+)?$/.exec(input.value);
         if (!address) {
             return;
         }
 
-        street = address.groups.street.trim();
-        number = address.groups.number?.trim();
-        postal = address.groups.postal?.trim();
-        city = address.groups.city?.trim();
-
-        if (number == undefined) {
-            addAddressOption(datalist, `${s.fullname}, ${s.l_pc} ${s.l_axon}`, s.f_jnctid);
+        const number = address.groups.number?.trim();
+        if (number === undefined) {
+            geocodeResults.set(`${s.fullname}, ${s.l_pc} ${s.l_axon}`, s.f_jnctid);
         } else {
+            const min = Math.min(s.l_f_add, s.l_t_add, s.r_f_add, s.r_t_add);
+            const max = Math.max(s.l_f_add, s.l_t_add, s.r_f_add, s.r_t_add);
+
             for (i = min; i <= max; i++) {
                 if (`${i}`.startsWith(`${number}`)) {
-                    addAddressOption(datalist, `${s.fullname} ${i}, ${s.l_pc} ${s.l_axon}`, s.f_jnctid);
+                    geocodeResults.set(`${s.fullname} ${i}, ${s.l_pc} ${s.l_axon}`, s.f_jnctid);
                 }
             }
         }
     });
 
-    if (suggestions.length == 0 && input.value.length != 0) {
+    return geocodeResults;
+}
+
+async function getPlaceResults(input) {
+    const places = await fetchJSON(window.location.origin + `/api/v1/places?input=${input.value}`, []);
+    const placeResults = new Map()
+
+    places.forEach(s => {
+        placeResults.set(`${s.fullname}, ${s.l_pc} ${s.l_axon}`, s.f_jnctid);
+    });
+
+    return placeResults;
+}
+
+async function addAddressSuggestions(input, datalist) {
+    const [geocodeResults, placeResults] = await Promise.all([
+        getGeocodeResults(input),
+        getPlaceResults(input)
+    ]);
+    datalist.innerHTML = ''
+
+    const maxResults = 10;
+    const maxPerSource = 5;
+
+    let geocodeArray = Array.from(geocodeResults.entries()).slice(0, maxPerSource);
+    let placeArray = Array.from(placeResults.entries()).slice(0, maxPerSource);
+
+    if (geocodeArray.length < maxPerSource) {
+        const remaining = maxPerSource - geocodeArray.length;
+        placeArray = Array.from(placeResults.entries()).slice(0, maxPerSource + remaining);
+    } else if (placeArray.length < maxPerSource) {
+        const remaining = maxPerSource - placeArray.length;
+        geocodeArray = Array.from(geocodeResults.entries()).slice(0, maxPerSource + remaining);
+    }
+
+    const combinedResults = [...placeArray, ...geocodeArray].slice(0, maxResults);
+
+    combinedResults.forEach(([key, value]) => {
+        addAddressOption(datalist, key, value);
+    });
+
+    if (combinedResults.length === 0) {
         addAddressOption(datalist, `${input.value} − No results found`, '');
     }
 }

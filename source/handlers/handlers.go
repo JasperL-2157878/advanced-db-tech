@@ -19,6 +19,13 @@ func HandleGeocode(ctx Context) {
 	ctx.res.Write(geocoding)
 }
 
+func HandlePlaces(ctx Context) {
+	input := ctx.Param("input")
+	places := ctx.db.Places(input)
+
+	ctx.res.Write(places)
+}
+
 func parseRouteRequest(ctx Context) (from int64, to int64) {
 	if !ctx.validateRouteParams() {
 		ctx.res.Write(types.EmptyGeoJSON.ToBytes())

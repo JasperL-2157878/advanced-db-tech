@@ -29,7 +29,7 @@ services:
       dockerfile: docker/Dockerfile.postgres
       args:
         PGDUMP_DOWNLOAD: ${PGDUMP_DOWNLOAD}
-    image: "postgis:custom"
+    image: "jasmo45/postgis-teleatlas"
     container_name: postgres
     restart: always
     shm_size: 128mb
