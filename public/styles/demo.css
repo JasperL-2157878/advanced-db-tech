@@ -93,3 +93,21 @@
     align-items: center;
     margin-bottom: 0;
 }
+
+.map-route-container {
+    margin: 0 0 0 -200px;
+    height: 500px;
+    width: 1200px;
+    display: flex;
+}
+
+.map {
+    flex: 1;
+    height: 100%;
+}
+
+.route-info {
+    flex: 0 0 400px;
+    margin-left: 16px;
+    overflow-y: auto;
+}

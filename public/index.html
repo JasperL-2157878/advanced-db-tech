@@ -52,7 +52,19 @@
             </fieldset>
         </form>
 
-        <div id="map" style="height: 500px; border-radius: 4px; margin-bottom: 1rem;"></div>
+        <div class="map-route-container">
+            <div class="map" id="map"></div>
+
+            <div class="route-info">
+                <div class="route-header">
+                    <h1 class="route-title">Route Overview</h1>
+                    <div class="route-summary" id="route-summary"></div>
+                </div>
+
+                <div class="route-steps" id="route-steps"></div>
+            </div>
+        </div>
+
         <div id="legend" style="margin-top: 20px; font-family: sans-serif;">
             <h4 style="margin-bottom: 8px;">Algorithm Legend</h4>
             <div style="display: flex; flex-wrap: wrap; gap: 16px;">
@@ -82,22 +94,11 @@
                 </div>
             </div>
         </div>
-
-
-        <div>
-            <div class="route-header">
-                <h1 class="route-title">Route Overview</h1>
-                <div class="route-summary" id="route-summary"></div>
-            </div>
-            
-            <div class="route-steps" id="route-steps"></div>
-        </div>
-
     </main>
 
 </body>
 
-<script src="scripts/directions.js"></script>
+<script src="/scripts/directions.js"></script>
 <script src="/scripts/map.js"></script>
 <script src="/scripts/geocode.js"></script>
 </html>
