@@ -389,6 +389,10 @@
 
     defaultRouteButton.addEventListener('click', function (e) {
         e.preventDefault();
+        // add erkestraat, neerpelt to the innerHTML of the fromInput
+        fromInput.value = 'Erkestraat, 3910 Neerpelt';
+        // add ieperleestraat, ieper to the innerHTML of the toInput
+        toInput.value = 'Ieperleestraat, 8900 Ieper';
         routeTest(10560298930511, 10560299626068);
     });
 
