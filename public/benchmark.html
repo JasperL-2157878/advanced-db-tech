@@ -370,15 +370,6 @@
             let geocodeArray = Array.from(geocodeResults.entries()).slice(0, maxPerSource);
             let placeArray = Array.from(placeResults.entries()).slice(0, maxPerSource);
 
-            defaultRouteButton.addEventListener('click', function (e) {
-                e.preventDefault();
-                // add erkestraat, neerpelt to the innerHTML of the fromInput
-                fromInput.value = 'Erkestraat, 3910 Neerpelt';
-                // add ieperleestraat, ieper to the innerHTML of the toInput
-                toInput.value = 'Ieperleestraat, 8900 Ieper';
-                routeTest(10560298930511, 10560299626068);
-            });
-
             if (geocodeArray.length < maxPerSource) {
                 const remaining = maxPerSource - geocodeArray.length;
                 placeArray = Array.from(placeResults.entries()).slice(0, maxPerSource + remaining);
@@ -434,6 +425,14 @@
 
         });
 
+        defaultRouteButton.addEventListener('click', function (e) {
+            e.preventDefault();
+            // add erkestraat, neerpelt to the innerHTML of the fromInput
+            fromInput.value = 'Erkestraat, 3910 Neerpelt';
+            // add ieperleestraat, ieper to the innerHTML of the toInput
+            toInput.value = 'Ieperleestraat, 8900 Ieper';
+            routeTest(10560298930511, 10560299626068);
+        });
     </script>
 </body>
 
