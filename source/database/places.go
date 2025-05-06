@@ -2,7 +2,6 @@ package db
 
 import (
 	"example.com/source/types"
-	"fmt"
 )
 
 func (db *Postgres) Places(input string) types.JSON {
@@ -29,9 +28,6 @@ func (db *Postgres) Places(input string) types.JSON {
 	if err != nil {
 		panic(err)
 	}
-
-	// dump the json to the console
-	fmt.Println(string(json))
 
 	if len(json) == 0 {
 		return types.JSON("[]")
